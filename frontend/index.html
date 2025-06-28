@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace de NFTs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Marketplace de NFTs con pagos en ERC20</h1>
+    </header>
+
+    <main>
+        <section id="wallet-status">
+            <h2>Estado de la Billetera</h2>
+            <p>Estado de Conexión: <span id="connect-status">Desconectado</span></p>
+            <p>Cuenta conectada: <span id="account-address">N/A</span></p>
+            <p>Balance de MTK: <span id="mtk-balance">0</span> MTK</p>
+            <button id="connect-button">Conectar Billetera</button>
+        </section>
+
+        <section id="nft-actions">
+            <h2>Acciones con tu NFT de prueba (ID: 0)</h2>
+            <div id="nft-info">
+                <p>Propietario actual del NFT #0: <span id="nft-owner">...</span></p>
+                <p>Estado del listado del NFT #0: <span id="listing-status">...</span></p>
+            </div>
+            <div id="actions-container">
+                <button id="list-nft-button">Listar NFT (0)</button>
+                <button id="buy-nft-button" style="display: none;">Comprar NFT (0)</button>
+                <button id="cancel-listing-button" style="display: none;">Cancelar Listado (0)</button>
+            </div>
+        </section>
+
+        <!-- ¡NUEVA SECCIÓN PARA MOSTRAR LOS NFTS DEL MARKETPLACE! -->
+        <section id="marketplace-container">
+            <h2>NFTs en el Marketplace</h2>
+            <p>Cargando NFTs...</p>
+            <!-- Los NFTs se cargarán aquí dinámicamente -->
+        </section>
+
+        <section id="logs">
+            <h2>Logs de Transacciones</h2>
+            <ul id="log-list">
+                <!-- Los logs se añadirán aquí -->
+            </ul>
+        </section>
+    </main>
+
+    <!-- Usamos unpkg como CDN alternativo para ethers.js -->
+    <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
