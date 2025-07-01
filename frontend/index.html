@@ -7,48 +7,90 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Marketplace de NFTs con pagos en ERC20</h1>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Mercado NFT Descentralizado</h1>
+            <p>Tu plataforma para comprar, vender y listar activos digitales únicos.</p>
+        </header>
 
-    <main>
-        <section id="wallet-status">
-            <h2>Estado de la Billetera</h2>
-            <p>Estado de Conexión: <span id="connect-status">Desconectado</span></p>
-            <p>Cuenta conectada: <span id="account-address">N/A</span></p>
-            <p>Balance de MTK: <span id="mtk-balance">0</span> MTK</p>
-            <button id="connect-button">Conectar Billetera</button>
-        </section>
+        <main>
+            <!-- Sección de Conexión de Billetera -->
+            <section id="wallet-status">
+                <h2>Estado de la Billetera</h2>
+                <div class="info-grid">
+                    <p><span>Estado de Conexión:</span> <span id="connect-status" class="status-disconnected">Desconectado</span></p>
+                    <p><span>Cuenta conectada:</span> <span id="account-address" class="truncate">N/A</span></p>
+                    <p><span>Balance de MTK:</span> <span id="mtk-balance" class="highlight">0</span> MTK</p>
+                </div>
+                <button id="connect-button" class="btn primary-btn">Conectar Billetera</button>
+            </section>
 
-        <section id="nft-actions">
-            <h2>Acciones con tu NFT de prueba (ID: 0)</h2>
-            <div id="nft-info">
-                <p>Propietario actual del NFT #0: <span id="nft-owner">...</span></p>
-                <p>Estado del listado del NFT #0: <span id="listing-status">...</span></p>
-            </div>
-            <div id="actions-container">
-                <button id="list-nft-button">Listar NFT (0)</button>
-                <button id="buy-nft-button" style="display: none;">Comprar NFT (0)</button>
-                <button id="cancel-listing-button" style="display: none;">Cancelar Listado (0)</button>
-            </div>
-        </section>
+            <!-- Sección "Tu Colección de NFTs y Acciones" -->
+            <section id="nft-actions">
+                <h2 id="nft-actions-title">Tu Colección de NFTs y Acciones</h2>
+                <p id="user-nft-summary" class="nft-summary-text">Cargando NFTs en tu billetera...</p>
 
-        <!-- ¡NUEVA SECCIÓN PARA MOSTRAR LOS NFTS DEL MARKETPLACE! -->
-        <section id="marketplace-container">
-            <h2>NFTs en el Marketplace</h2>
-            <p>Cargando NFTs...</p>
-            <!-- Los NFTs se cargarán aquí dinámicamente -->
-        </section>
+                <div class="info-grid">
+                    <p><span>Cantidad de NFTs en billetera:</span> <span id="nft-owner" class="truncate">...</span></p>
+                </div>
+                <div class="actions-container">
+                    <button id="list-nft-button" class="btn success-btn">Listar NFTs</button>
+                    <button id="buy-nft-button" style="display: none;"></button> 
+                    <button id="cancel-listing-button" style="display: none;"></button>
+                </div>
+            </section>
 
-        <section id="logs">
-            <h2>Logs de Transacciones</h2>
-            <ul id="log-list">
-                <!-- Los logs se añadirán aquí -->
-            </ul>
-        </section>
-    </main>
+            <section id="user-nfts-collection-section" style="display: none;">
+                <h2>NFTs en tu billetera</h2>
+                <p>Total: <span id="nft-owner">0</span></p>
+                <div id="user-nfts-grid" class="nft-grid"></div>
+            </section>
 
-    <!-- Usamos unpkg como CDN alternativo para ethers.js -->
+            <!-- ✅ Sección de Minteo Personalizado -->
+            <section id="mint-nft-section">
+                <h2>Crear un Nuevo NFT</h2>
+                <p>Mintea un nuevo NFT directamente a tu billetera. Solo nombre y precio.</p>
+                <button id="toggle-mint-form" class="btn primary-btn">Crear NFT</button>
+
+                <div id="mint-form-container" style="display: none; margin-top: 20px;">
+                    <form id="mint-form">
+                        <div class="info-grid">
+                            <label>
+                                Nombre del NFT:
+                                <input type="text" id="nft-name" required>
+                            </label>
+                            <label>
+                                Precio en MTK:
+                                <input type="number" id="nft-price" required step="0.01" min="0">
+                            </label>
+                        </div>
+                        <div class="actions-container">
+                            <button type="submit" class="btn success-btn">Mintear</button>
+                            <button type="button" id="cancel-mint" class="btn danger-btn">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ✅ Sección del Marketplace -->
+            <section id="marketplace-container">
+                <h2>NFTs en el Marketplace</h2>
+                <div class="nft-grid">
+                    <p>Cargando NFTs...</p>
+                </div>
+            </section>
+
+            <!-- Sección de Logs -->
+            <section id="logs">
+                <h2>Logs de Transacciones</h2>
+                <div class="log-scroll-area">
+                    <ul id="log-list"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Ethers.js -->
     <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="app.js"></script>
 </body>

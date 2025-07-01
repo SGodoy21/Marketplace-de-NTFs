@@ -1,56 +1,286 @@
+/* Importa una fuente más moderna como 'Inter' si lo deseas, o usa sans-serif */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 body {
-    font-family: sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    font-family: 'Inter', sans-serif; /* Usamos Inter, si no carga, se usará sans-serif */
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    min-height: 100vh; /* Asegura que el degradado cubra toda la altura */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Degradado de azul a púrpura */
+    color: #e0e0e0; /* Color de texto general más claro para fondo oscuro */
+    box-sizing: border-box; /* Incluir padding y border en el tamaño del elemento */
 }
+
+.container {
+    background-color: rgba(30, 41, 59, 0.95); /* Gris oscuro con transparencia sutil */
+    border-radius: 12px; /* Esquinas más redondeadas */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); /* Sombra más pronunciada */
+    padding: 30px;
+    margin: 20px;
+    max-width: 900px; /* Ancho máximo para el contenido principal */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    box-sizing: border-box;
+}
+
 header {
     text-align: center;
     padding: 20px 0;
-    background-color: #fff;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1); /* Línea divisoria sutil */
 }
+
+header h1 {
+    font-size: 3.5rem; /* Título más grande */
+    font-weight: 700; /* Más negrita */
+    color: #93c5fd; /* Azul más claro */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6); /* Sombra de texto */
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 1.2rem;
+    color: #a0aec0; /* Gris azulado */
+}
+
 main {
-    max-width: 800px;
-    margin: auto;
     display: grid;
-    gap: 20px;
+    gap: 30px; /* Espacio entre secciones */
 }
+
 section {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background-color: rgba(45, 55, 72, 0.85); /* Gris más claro para las secciones */
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Sombra para secciones */
+    border: 1px solid rgba(147, 197, 253, 0.2); /* Borde sutil */
 }
-button {
-    padding: 10px 20px;
+
+section h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #a8dadc; /* Un tono de azul verdoso */
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Grid para la información de la billetera y NFT */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Una columna por defecto */
+    gap: 15px;
+    font-size: 1.1rem;
+}
+
+.info-grid p {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-grid span:first-child {
+    font-weight: 400;
+    color: #cbd5e0; /* Gris claro */
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.info-grid span:last-child {
+    font-weight: 600;
+    color: #e2e8f0; /* Blanco más suave */
+    word-break: break-all; /* Para direcciones largas */
+}
+
+.status-disconnected {
+    color: #ef4444; /* Rojo */
+}
+.status-connected {
+    color: #22c55e; /* Verde */
+}
+.highlight {
+    color: #facc15; /* Amarillo para balances */
+    font-weight: 700;
+}
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Estilos para botones */
+.actions-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+    gap: 15px; /* Espacio entre botones */
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 25px;
     border: none;
-    background-color: #007bff;
-    color: white;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease; /* Transiciones suaves para hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    flex-grow: 1; /* Permite que los botones se estiren */
+    min-width: 150px; /* Ancho mínimo para legibilidad */
 }
-button:hover {
-    background-color: #0056b3;
+
+.btn:hover {
+    transform: translateY(-2px); /* Pequeño levantamiento en hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
-button:disabled {
-    background-color: #ccc;
+
+.btn:disabled {
+    background-color: #6b7280; /* Gris oscuro para deshabilitado */
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7;
 }
+
+/* Colores específicos para los botones */
+.primary-btn { background-color: #3b82f6; } /* Azul */
+.primary-btn:hover:not(:disabled) { background-color: #2563eb; }
+
+.success-btn { background-color: #10b981; } /* Verde */
+.success-btn:hover:not(:disabled) { background-color: #059669; }
+
+.info-btn { background-color: #6366f1; } /* Púrpura */
+.info-btn:hover:not(:disabled) { background-color: #4f46e5; }
+
+.danger-btn { background-color: #ef4444; } /* Rojo */
+.danger-btn:hover:not(:disabled) { background-color: #dc2626; }
+
+
+/* Estilos para el contenedor de NFTs en el Marketplace */
+.nft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Columnas responsivas */
+    gap: 20px; /* Espacio entre tarjetas NFT */
+}
+
+.nft-card {
+    background-color: rgba(31, 41, 55, 0.9); /* Fondo un poco más oscuro para la tarjeta */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(147, 197, 253, 0.15);
+    text-align: center;
+    transition: transform 0.2s ease-in-out;
+}
+
+.nft-card:hover {
+    transform: translateY(-5px); /* Efecto de "levantamiento" en hover */
+}
+
+.nft-card h3 {
+    font-size: 1.5rem;
+    color: #93c5fd;
+    margin-bottom: 10px;
+}
+
+.nft-card p {
+    font-size: 1rem;
+    color: #cbd5e0;
+    margin-bottom: 8px;
+}
+
+.nft-card .buy-button {
+    width: 100%;
+    margin-top: 15px;
+    /* Los estilos de .btn ya se aplicarán, solo ajustar si es necesario */
+}
+
+/* Estilos para los Logs */
+.log-scroll-area {
+    max-height: 200px; /* Altura máxima para el área de logs */
+    overflow-y: auto; /* Scroll si hay muchos logs */
+    background-color: rgba(31, 41, 55, 0.7);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid rgba(147, 197, 253, 0.1);
+}
+
 #log-list {
     list-style: none;
     padding: 0;
-    margin-top: 10px;
+    margin: 0;
 }
+
 #log-list li {
-    background-color: #e9ecef;
-    padding: 8px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    font-family: monospace;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.9rem;
+    color: #a0aec0;
+    font-family: 'Consolas', 'Monaco', monospace; /* Fuente monoespaciada para logs */
+    word-break: break-all; /* Asegura que los logs largos no desborden */
 }
+
+#log-list li:last-child {
+    border-bottom: none;
+}
+
+/* Estilo para los mensajes de éxito/error en los logs (puedes añadir clases en addLog) */
+#log-list li.success {
+    color: #10b981; /* Verde */
+}
+#log-list li.error {
+    color: #ef4444; /* Rojo */
+}
+#log-list li.info {
+    color: #60a5fa; /* Azul claro */
+}
+
+
+/* Media Queries para responsividad */
+@media (min-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr 1fr; /* Dos columnas en pantallas medianas y grandes */
+    }
+    .actions-container {
+        flex-direction: row; /* Botones en fila */
+    }
+}
+
+@media (min-width: 1024px) {
+    .nft-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Columnas más grandes en pantallas grandes */
+    }
+}
+
+.btn-comprar {
+  background-color: #007bff; /* Azul */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-cancelar {
+  background-color: #dc3545; /* Rojo */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Opcional: efecto hover */
+.btn-comprar:hover {
+  background-color: #0056b3;
+}
+
+.btn-cancelar:hover {
+  background-color: #a71d2a;
+}
+

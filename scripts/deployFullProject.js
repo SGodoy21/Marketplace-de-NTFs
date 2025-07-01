@@ -11,6 +11,7 @@ async function main() {
     const initialSupply = ethers.parseUnits("1000000", 18); // 1 millón de tokens
 
     const MyToken = await ethers.getContractFactory("MyToken");
+    // Desplegamos MyToken con la cantidad inicial (asumiendo que tu constructor MyToken.sol espera esto)
     const myToken = await MyToken.deploy(initialSupply);
     await myToken.waitForDeployment();
     
@@ -36,10 +37,7 @@ async function main() {
     console.log("------------------------------------------");
     console.log("3. Deploying Marketplace contract...");
 
-    // Obtenemos la fábrica del contrato Marketplace
     const Marketplace = await ethers.getContractFactory("Marketplace");
-
-    // Desplegamos el contrato, pasando las direcciones de los contratos anteriores
     const marketplace = await Marketplace.deploy(nftAddress, tokenAddress);
     await marketplace.waitForDeployment();
 
@@ -50,28 +48,67 @@ async function main() {
     console.log("Deployment finished successfully!");
     console.log(" ");
     console.log("📋 Contract Addresses:");
-    console.log(`   - MyToken:     ${tokenAddress}`);
-    console.log(`   - MyNFT:       ${nftAddress}`);
-    console.log(`   - Marketplace: ${marketplaceAddress}`);
+    console.log(`    - MyToken:     ${tokenAddress}`);
+    console.log(`    - MyNFT:       ${nftAddress}`);
+    console.log(`    - Marketplace: ${marketplaceAddress}`);
     console.log(" ");
 
-    // Opcional: Mintear un NFT de prueba y aprobar el Marketplace para transferirlo
+    // =======================================================================
+    // 4. Mintear y Listar NFTs de Prueba
+    // =======================================================================
     const [deployer] = await ethers.getSigners();
     console.log("------------------------------------------");
-    console.log("4. Minting a test NFT and approving the Marketplace...");
+    console.log("4. Minting and Listing Test NFTs...");
 
-    // Mint a test NFT for the deployer
-    const tokenURI = "ipfs://Qmb8Vz1y4d2zL2T3zL3Y4g5R6w7x8y9z0a1b2c3d4e5f6"; // Replace with your IPFS URI
-    const mintTx = await myNFT.safeMint(deployer.address, tokenURI);
-    await mintTx.wait();
+    // NFT ID 0
+    const NFT_URI_0 = "ipfs://QmYxXgH1j2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8a9b0c1d2e3f4_ID0";
+    const mintTx0 = await myNFT.safeMint(deployer.address, NFT_URI_0);
+    await mintTx0.wait();
     console.log(`✅ Minted NFT with ID 0 to deployer: ${deployer.address}`);
 
-    // Approve the Marketplace contract to manage the NFT
-    const approveTx = await myNFT.approve(marketplaceAddress, 0); // Approve token ID 0
-    await approveTx.wait();
+    const approveTx0 = await myNFT.approve(marketplaceAddress, 0);
+    await approveTx0.wait();
     console.log(`✅ Approved Marketplace to manage NFT ID 0`);
 
+    const LISTING_PRICE_0 = ethers.parseUnits("100", 18); // 100 MTK
+    const listTx0 = await marketplace.listItem(0, LISTING_PRICE_0);
+    await listTx0.wait();
+    console.log(`✅ Listed NFT ID 0 for 100 MTK`);
+
+
+    // NFT ID 1
+    const NFT_URI_1 = "ipfs://QmYxXgH1j2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8a9b0c1d2e3f4_ID1";
+    const mintTx1 = await myNFT.safeMint(deployer.address, NFT_URI_1);
+    await mintTx1.wait();
+    console.log(`✅ Minted NFT with ID 1 to deployer: ${deployer.address}`);
+
+    const approveTx1 = await myNFT.approve(marketplaceAddress, 1);
+    await approveTx1.wait();
+    console.log(`✅ Approved Marketplace to manage NFT ID 1`);
+
+    const LISTING_PRICE_1 = ethers.parseUnits("150", 18); // 150 MTK
+    const listTx1 = await marketplace.listItem(1, LISTING_PRICE_1);
+    await listTx1.wait();
+    console.log(`✅ Listed NFT ID 1 for 150 MTK`);
+
+
+    // NFT ID 2
+    const NFT_URI_2 = "ipfs://QmYxXgH1j2K3L4M5N6O7P8Q9R0S1T2U3V4W5X6Y7Z8a9b0c1d2e3f4_ID2";
+    const mintTx2 = await myNFT.safeMint(deployer.address, NFT_URI_2);
+    await mintTx2.wait();
+    console.log(`✅ Minted NFT with ID 2 to deployer: ${deployer.address}`);
+
+    const approveTx2 = await myNFT.approve(marketplaceAddress, 2);
+    await approveTx2.wait();
+    console.log(`✅ Approved Marketplace to manage NFT ID 2`);
+
+    const LISTING_PRICE_2 = ethers.parseUnits("200", 18); // 200 MTK
+    const listTx2 = await marketplace.listItem(2, LISTING_PRICE_2);
+    await listTx2.wait();
+    console.log(`✅ Listed NFT ID 2 for 200 MTK`);
+
     console.log("------------------------------------------");
+    console.log("Deployment and initial setup complete.");
 }
 
 // Se recomienda usar este patrón para manejar errores

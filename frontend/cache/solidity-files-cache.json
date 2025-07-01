@@ -38,8 +38,8 @@
       ]
     },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\contracts\\Marketplace.sol": {
-      "lastModificationDate": 1751216952315,
-      "contentHash": "14646cfa88a7068f0c14b367ca8c5c19",
+      "lastModificationDate": 1751124874291,
+      "contentHash": "73f6725969d4b858764c4ca3b98ef18c",
       "sourceName": "contracts/Marketplace.sol",
       "solcConfig": {
         "version": "0.8.28",
@@ -67,14 +67,93 @@
       },
       "imports": [
         "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/token/ERC721/IERC721.sol",
-        "@openzeppelin/contracts/token/ERC20/IERC20.sol"
+        "./MyNFT.sol",
+        "./MyToken.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
         "Marketplace"
+      ]
+    },
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\contracts\\MyToken.sol": {
+      "lastModificationDate": 1751064752612,
+      "contentHash": "61d37566cb51305e51bd0189a011081f",
+      "sourceName": "contracts/MyToken.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        "@openzeppelin/contracts/access/Ownable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MyToken"
+      ]
+    },
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\contracts\\MyNFT.sol": {
+      "lastModificationDate": 1751114298374,
+      "contentHash": "ec9327f705514e967e7b71634ee1e44a",
+      "sourceName": "contracts/MyNFT.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
+        "@openzeppelin/contracts/access/Ownable.sol",
+        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "MyNFT"
       ]
     },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\access\\Ownable.sol": {
@@ -115,46 +194,10 @@
         "Ownable"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
-      "lastModificationDate": 1751066294201,
-      "contentHash": "8f19f64d2adadf448840908bbaf431c8",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IERC20"
-      ]
-    },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\IERC721.sol": {
-      "lastModificationDate": 1751066294448,
-      "contentHash": "1fdc621cd6747e8985e11fc76ce74511",
-      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
+      "lastModificationDate": 1751066292817,
+      "contentHash": "57d79df281f57bbb1b09214c7914f877",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -180,13 +223,16 @@
         }
       },
       "imports": [
-        "../../utils/introspection/IERC165.sol"
+        "./IERC20.sol",
+        "./extensions/IERC20Metadata.sol",
+        "../../utils/Context.sol",
+        "../../interfaces/draft-IERC6093.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "IERC721"
+        "ERC20"
       ]
     },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\Context.sol": {
@@ -225,10 +271,10 @@
         "Context"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\IERC165.sol": {
-      "lastModificationDate": 1751066294106,
-      "contentHash": "bf0119eb2a570f219729ff38b6cd1df8",
-      "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol": {
+      "lastModificationDate": 1751066291945,
+      "contentHash": "267d92fe4de67b1bdb3302c08f387dbf",
+      "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -258,13 +304,15 @@
         "^0.8.20"
       ],
       "artifacts": [
-        "IERC165"
+        "IERC1155Errors",
+        "IERC20Errors",
+        "IERC721Errors"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC721.sol": {
-      "lastModificationDate": 1751066294427,
-      "contentHash": "d8d23fc2f55ed934d1a1b91c9afd8526",
-      "sourceName": "@openzeppelin/contracts/interfaces/IERC721.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\IERC20.sol": {
+      "lastModificationDate": 1751066294201,
+      "contentHash": "8f19f64d2adadf448840908bbaf431c8",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -289,18 +337,18 @@
           }
         }
       },
-      "imports": [
-        "../token/ERC721/IERC721.sol"
-      ],
+      "imports": [],
       "versionPragmas": [
         "^0.8.20"
       ],
-      "artifacts": []
+      "artifacts": [
+        "IERC20"
+      ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC4906.sol": {
-      "lastModificationDate": 1751066294331,
-      "contentHash": "273c26c9c728a6052d1175ace81d10b4",
-      "sourceName": "@openzeppelin/contracts/interfaces/IERC4906.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
+      "lastModificationDate": 1751066294230,
+      "contentHash": "794db3115001aa372c79326fcfd44b1f",
+      "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -326,128 +374,13 @@
         }
       },
       "imports": [
-        "./IERC165.sol",
-        "./IERC721.sol"
+        "../IERC20.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "IERC4906"
-      ]
-    },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC165.sol": {
-      "lastModificationDate": 1751066294097,
-      "contentHash": "f808b485ee0cdc6768ee8385ae5f9a2a",
-      "sourceName": "@openzeppelin/contracts/interfaces/IERC165.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../utils/introspection/IERC165.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": []
-    },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\ERC165.sol": {
-      "lastModificationDate": 1751066292693,
-      "contentHash": "7c03c1e37c3dc24eafb76dc2b8a5c3a6",
-      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "./IERC165.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ERC165"
-      ]
-    },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\ERC721Enumerable.sol": {
-      "lastModificationDate": 1751066293246,
-      "contentHash": "bf1596648447152f4d3a5f5bc4444a6e",
-      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../ERC721.sol",
-        "./IERC721Enumerable.sol",
-        "../../../utils/introspection/ERC165.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ERC721Enumerable"
+        "IERC20Metadata"
       ]
     },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\ERC721.sol": {
@@ -494,10 +427,10 @@
         "ERC721"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\IERC721Enumerable.sol": {
-      "lastModificationDate": 1751066294467,
-      "contentHash": "3fdc14aab706458ae99314f6f7f529a2",
-      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\ERC721URIStorage.sol": {
+      "lastModificationDate": 1751066293328,
+      "contentHash": "9aefce4573c7ae661acf9d5d78d5450b",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -523,13 +456,16 @@
         }
       },
       "imports": [
-        "../IERC721.sol"
+        "../ERC721.sol",
+        "../../../utils/Strings.sol",
+        "../../../interfaces/IERC4906.sol",
+        "../../../interfaces/IERC165.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "IERC721Enumerable"
+        "ERC721URIStorage"
       ]
     },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\Strings.sol": {
@@ -572,10 +508,10 @@
         "Strings"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\draft-IERC6093.sol": {
-      "lastModificationDate": 1751066291945,
-      "contentHash": "267d92fe4de67b1bdb3302c08f387dbf",
-      "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\ERC165.sol": {
+      "lastModificationDate": 1751066292693,
+      "contentHash": "7c03c1e37c3dc24eafb76dc2b8a5c3a6",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -600,14 +536,52 @@
           }
         }
       },
-      "imports": [],
+      "imports": [
+        "./IERC165.sol"
+      ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "IERC1155Errors",
-        "IERC20Errors",
-        "IERC721Errors"
+        "ERC165"
+      ]
+    },
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\IERC721.sol": {
+      "lastModificationDate": 1751066294448,
+      "contentHash": "1fdc621cd6747e8985e11fc76ce74511",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../utils/introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC721"
       ]
     },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\IERC721Metadata.sol": {
@@ -725,6 +699,42 @@
         "SignedMath"
       ]
     },
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeCast.sol": {
+      "lastModificationDate": 1751066294863,
+      "contentHash": "2adca1150f58fc6f3d1f0a0f22ee7cca",
+      "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SafeCast"
+      ]
+    },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\math\\Math.sol": {
       "lastModificationDate": 1751066294647,
       "contentHash": "5ec781e33d3a9ac91ffdc83d94420412",
@@ -764,42 +774,6 @@
         "Math"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\math\\SafeCast.sol": {
-      "lastModificationDate": 1751066294863,
-      "contentHash": "2adca1150f58fc6f3d1f0a0f22ee7cca",
-      "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "SafeCast"
-      ]
-    },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\Panic.sol": {
       "lastModificationDate": 1751066294785,
       "contentHash": "2133dc13536b4a6a98131e431fac59e1",
@@ -834,6 +808,42 @@
       ],
       "artifacts": [
         "Panic"
+      ]
+    },
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\utils\\introspection\\IERC165.sol": {
+      "lastModificationDate": 1751066294106,
+      "contentHash": "bf0119eb2a570f219729ff38b6cd1df8",
+      "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC165"
       ]
     },
     "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\IERC721Receiver.sol": {
@@ -872,10 +882,10 @@
         "IERC721Receiver"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\ERC721URIStorage.sol": {
-      "lastModificationDate": 1751066293328,
-      "contentHash": "9aefce4573c7ae661acf9d5d78d5450b",
-      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC4906.sol": {
+      "lastModificationDate": 1751066294331,
+      "contentHash": "273c26c9c728a6052d1175ace81d10b4",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC4906.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -901,22 +911,20 @@
         }
       },
       "imports": [
-        "../ERC721.sol",
-        "../../../utils/Strings.sol",
-        "../../../interfaces/IERC4906.sol",
-        "../../../interfaces/IERC165.sol"
+        "./IERC165.sol",
+        "./IERC721.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "ERC721URIStorage"
+        "IERC4906"
       ]
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\contracts\\MyNFT.sol": {
-      "lastModificationDate": 1751238449621,
-      "contentHash": "1cafa9328b4a99ea3705fc0e99d77de5",
-      "sourceName": "contracts/MyNFT.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC165.sol": {
+      "lastModificationDate": 1751066294097,
+      "contentHash": "f808b485ee0cdc6768ee8385ae5f9a2a",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC165.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -942,22 +950,17 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
-        "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol"
+        "../utils/introspection/IERC165.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
-      "artifacts": [
-        "MyNFT"
-      ]
+      "artifacts": []
     },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol": {
-      "lastModificationDate": 1751066292817,
-      "contentHash": "57d79df281f57bbb1b09214c7914f877",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC721.sol": {
+      "lastModificationDate": 1751066294427,
+      "contentHash": "d8d23fc2f55ed934d1a1b91c9afd8526",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC721.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -983,94 +986,12 @@
         }
       },
       "imports": [
-        "./IERC20.sol",
-        "./extensions/IERC20Metadata.sol",
-        "../../utils/Context.sol",
-        "../../interfaces/draft-IERC6093.sol"
+        "../token/ERC721/IERC721.sol"
       ],
       "versionPragmas": [
         "^0.8.20"
       ],
-      "artifacts": [
-        "ERC20"
-      ]
-    },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\node_modules\\@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol": {
-      "lastModificationDate": 1751066294230,
-      "contentHash": "794db3115001aa372c79326fcfd44b1f",
-      "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../IERC20.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IERC20Metadata"
-      ]
-    },
-    "C:\\Users\\santy\\OneDrive\\Escritorio\\Marketplace de NTFs\\contracts\\MyToken.sol": {
-      "lastModificationDate": 1751064752612,
-      "contentHash": "61d37566cb51305e51bd0189a011081f",
-      "sourceName": "contracts/MyToken.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "MyToken"
-      ]
+      "artifacts": []
     }
   }
 }
