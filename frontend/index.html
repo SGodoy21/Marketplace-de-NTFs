@@ -5,92 +5,265 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace de NFTs</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Añadido: Enlace a Tailwind CSS -->
+    <style>
+        /* Estilos CSS personalizados para la dApp */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .status-connected {
+            color: #22c55e; /* green-500 */
+            font-weight: bold;
+        }
+        .status-disconnected {
+            color: #ef4444; /* red-500 */
+            font-weight: bold;
+        }
+        .highlight {
+            color: #60a5fa; /* blue-400 */
+            font-weight: bold;
+        }
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .primary-btn {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+        .primary-btn:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: scale(1.02);
+        }
+        .secondary-btn {
+            background-color: #6b7280; /* gray-500 */
+            color: white;
+        }
+        .secondary-btn:hover {
+            background-color: #4b5563; /* gray-600 */
+            transform: scale(1.02);
+        }
+        .success-btn {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+        }
+        .success-btn:hover {
+            background-color: #16a34a; /* green-600 */
+            transform: scale(1.02);
+        }
+        .danger-btn {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+        }
+        .danger-btn:hover {
+            background-color: #dc2626; /* red-600 */
+            transform: scale(1.02);
+        }
+        .info-btn {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+        .info-btn:hover {
+            background-color: #2563eb; /* blue-600 */
+            transform: scale(1.02);
+        }
+        .nft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        .nft-card {
+            background-color: #1f2937; /* gray-800 */
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #4f46e5; /* indigo-600 */
+        }
+        .nft-card h3 {
+            font-size: 1.75rem; /* text-2xl */
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            color: #93c5fd; /* blue-300 */
+        }
+        .nft-card p {
+            font-size: 1rem; /* text-base */
+            color: #d1d5db; /* gray-300 */
+            margin-bottom: 0.5rem;
+        }
+        .nft-card .btn {
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        @media (min-width: 768px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .log-scroll-area {
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #1f2937; /* gray-800 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #4f46e5; /* indigo-600 */
+        }
+        #log-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db; /* gray-300 */
+        }
+        #log-list li:last-child {
+            border-bottom: none;
+        }
+        #log-list li.success {
+            color: #22c55e; /* green-500 */
+        }
+        #log-list li.error {
+            color: #ef4444; /* red-500 */
+        }
+        #log-list li.info {
+            color: #60a5fa; /* blue-400 */
+        }
+        /* Estilos específicos para el formulario de minteo */
+        .input-field {
+            background-color: #2d3748; /* gray-700 */
+            color: #e2e8f0; /* gray-200 */
+            border: 1px solid #4a5568; /* gray-600 */
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            width: 100%;
+            box-sizing: border-box; /* Asegura que el padding no aumente el ancho total */
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #60a5fa; /* blue-400 */
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5);
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Mercado NFT Descentralizado</h1>
-            <p>Tu plataforma para comprar, vender y listar activos digitales únicos.</p>
+    <div class="container mx-auto max-w-4xl bg-gray-900 text-white rounded-xl shadow-2xl p-8 space-y-8">
+        <header class="text-center">
+            <h1 class="text-5xl font-extrabold text-blue-300 drop-shadow-lg mb-2">
+                Mercado NFT Descentralizado
+            </h1>
+            <p class="text-xl text-gray-300">
+                Tu plataforma para comprar, vender y listar activos digitales únicos.
+            </p>
         </header>
 
-        <main>
-            <!-- Sección de Conexión de Billetera -->
-            <section id="wallet-status">
-                <h2>Estado de la Billetera</h2>
-                <div class="info-grid">
-                    <p><span>Estado de Conexión:</span> <span id="connect-status" class="status-disconnected">Desconectado</span></p>
-                    <p><span>Cuenta conectada:</span> <span id="account-address" class="truncate">N/A</span></p>
-                    <p><span>Balance de MTK:</span> <span id="mtk-balance" class="highlight">0</span> MTK</p>
+        <!-- Sección de Conexión de Billetera -->
+        <section id="wallet-status" class="bg-gray-800 p-6 rounded-lg shadow-xl border border-blue-700">
+            <h2 class="text-3xl font-semibold text-blue-200 mb-4">
+                Estado de la Billetera
+            </h2>
+            <div class="info-grid">
+                <div class="flex flex-col">
+                    <span class="font-medium text-gray-400">Estado de Conexión:</span>
+                    <span id="connect-status" class="status-disconnected">Desconectado</span>
                 </div>
-                <button id="connect-button" class="btn primary-btn">Conectar Billetera</button>
-            </section>
-
-            <!-- Sección "Tu Colección de NFTs y Acciones" -->
-            <section id="nft-actions">
-                <h2 id="nft-actions-title">Tu Colección de NFTs y Acciones</h2>
-                <p id="user-nft-summary" class="nft-summary-text">Cargando NFTs en tu billetera...</p>
-
-                <div class="info-grid">
-                    <p><span>Cantidad de NFTs en billetera:</span> <span id="nft-owner" class="truncate">...</span></p>
+                <div class="flex flex-col">
+                    <span class="font-medium text-gray-400">Cuenta conectada:</span>
+                    <span id="account-address" class="truncate">N/A</span>
                 </div>
-                <div class="actions-container">
-                    <button id="list-nft-button" class="btn success-btn">Listar NFTs</button>
-                    <button id="buy-nft-button" style="display: none;"></button> 
-                    <button id="cancel-listing-button" style="display: none;"></button>
+                <div class="flex flex-col">
+                    <span class="font-medium text-gray-400">Balance de MTK:</span>
+                    <span id="mtk-balance" class="highlight">0</span> MTK
                 </div>
-            </section>
+            </div>
+            <button id="connect-button"
+                class="mt-6 w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
+                Conectar Billetera
+            </button>
+            <button id="add-network-button" class="btn secondary-btn mt-4 hidden">Añadir Red Hardhat a MetaMask</button>
+        </section>
 
-            <section id="user-nfts-collection-section" style="display: none;">
-                <h2>NFTs en tu billetera</h2>
-                <p>Total: <span id="nft-owner">0</span></p>
-                <div id="user-nfts-grid" class="nft-grid"></div>
-            </section>
+        <!-- Sección para Mintear Nuevos NFTs -->
+        <section id="mint-nft-section" class="bg-gray-800 p-6 rounded-lg shadow-xl border border-blue-700">
+            <h2 class="text-3xl font-semibold text-blue-200 mb-4">
+                Crear un Nuevo NFT
+            </h2>
+            <p class="text-gray-300 mb-4">Mintea un nuevo NFT directamente a tu billetera. Solo nombre y precio.</p>
+            <!-- Botón para abrir/cerrar el formulario de minteo -->
+            <button id="toggle-mint-form" class="btn primary-btn w-full">Abrir Formulario de Minteo</button>
 
-            <!-- ✅ Sección de Minteo Personalizado -->
-            <section id="mint-nft-section">
-                <h2>Crear un Nuevo NFT</h2>
-                <p>Mintea un nuevo NFT directamente a tu billetera. Solo nombre y precio.</p>
-                <button id="toggle-mint-form" class="btn primary-btn">Crear NFT</button>
+            <!-- Contenedor del formulario de minteo, inicialmente oculto -->
+            <div id="mint-form-container" class="hidden mt-6 p-4 border border-gray-600 rounded-lg">
+                <h3 class="text-2xl font-semibold text-blue-200 mb-4">Detalles del Nuevo NFT</h3>
+                <form id="mint-form">
+                    <div class="mb-4">
+                        <label for="nft-name" class="block text-gray-300 text-sm font-bold mb-2">Nombre del NFT:</label>
+                        <input type="text" id="nft-name" placeholder="Ej: Mi Obra de Arte Digital #1"
+                            class="input-field" required>
+                    </div>
+                    <div class="mb-6">
+                        <label for="nft-price" class="block text-gray-300 text-sm font-bold mb-2">Precio de Listado por Defecto (MTK):</label>
+                        <input type="number" id="nft-price" value="100" min="1" step="0.01"
+                            class="input-field" required>
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="submit" id="create-nft-button" class="btn success-btn">Crear NFT</button>
+                        <button type="button" id="cancel-mint" class="btn secondary-btn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
 
-                <div id="mint-form-container" style="display: none; margin-top: 20px;">
-                    <form id="mint-form">
-                        <div class="info-grid">
-                            <label>
-                                Nombre del NFT:
-                                <input type="text" id="nft-name" required>
-                            </label>
-                            <label>
-                                Precio en MTK:
-                                <input type="number" id="nft-price" required step="0.01" min="0">
-                            </label>
-                        </div>
-                        <div class="actions-container">
-                            <button type="submit" class="btn success-btn">Mintear</button>
-                            <button type="button" id="cancel-mint" class="btn danger-btn">Cancelar</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
+        <!-- Sección para la Colección de NFTs del Usuario -->
+        <section id="user-nfts-collection-section" class="hidden bg-gray-800 p-6 rounded-lg shadow-xl border border-blue-700">
+            <h2 class="text-3xl font-semibold text-blue-200 mb-4">
+                Tus NFTs en Billetera (<span id="user-nfts-count" class="highlight">0</span>)
+            </h2>
+            <div id="user-nfts-grid" class="nft-grid">
+                <p class="text-gray-400">Cargando tus NFTs...</p>
+            </div>
+            <!-- Botón global para listar todos los NFTs no listados -->
+            <button id="list-all-user-nfts-button" class="btn primary-btn mt-6 w-full">Listar todos mis NFTs no listados</button>
+        </section>
 
-            <!-- ✅ Sección del Marketplace -->
-            <section id="marketplace-container">
-                <h2>NFTs en el Marketplace</h2>
-                <div class="nft-grid">
-                    <p>Cargando NFTs...</p>
-                </div>
-            </section>
+        <!-- Sección del Marketplace (Para NFTs listados) -->
+        <section id="marketplace-container" class="bg-gray-800 p-6 rounded-lg shadow-xl border border-blue-700">
+            <h2 class="text-3xl font-semibold text-blue-200 mb-4">
+                NFTs en el Marketplace
+            </h2>
+            <div id="marketplace-grid" class="nft-grid">
+                <p class="text-gray-400">Cargando ítems...</p>
+            </div>
+            <!-- Botón para recargar el marketplace (si lo deseas) -->
+            <button id="load-marketplace-button" class="btn secondary-btn mt-6 w-full">Recargar Marketplace</button>
+        </section>
 
-            <!-- Sección de Logs -->
-            <section id="logs">
-                <h2>Logs de Transacciones</h2>
-                <div class="log-scroll-area">
-                    <ul id="log-list"></ul>
-                </div>
-            </section>
-        </main>
+        <!-- Sección de Logs de Transacciones -->
+        <section id="logs" class="bg-gray-800 p-6 rounded-lg shadow-xl border border-blue-700">
+            <h2 class="text-3xl font-semibold text-blue-200 mb-4">
+                Logs de Transacciones
+            </h2>
+            <div class="max-h-60 overflow-y-auto bg-gray-700 p-4 rounded-md">
+                <ul id="log-list" class="text-sm text-gray-300 list-none p-0">
+                    <!-- Los logs se añadirán aquí dinámicamente -->
+                </ul>
+            </div>
+        </section>
     </div>
 
-    <!-- Ethers.js -->
+    <!-- Carga la biblioteca Ethers.js -->
     <script src="https://unpkg.com/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
