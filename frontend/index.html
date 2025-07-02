@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Marketplace de NFTs</title>
+    <!-- Incluye Tailwind CSS para estilos modernos y responsivos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Enlaza a tu styles.css local para estilos personalizados -->
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Añadido: Enlace a Tailwind CSS -->
     <style>
-        /* Estilos CSS personalizados para la dApp */
+        /* Estilos CSS personalizados para la dApp (pueden ser movidos a styles.css si se desea) */
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Clases de estado y resaltado para la UI */
         .status-connected {
             color: #22c55e; /* green-500 */
             font-weight: bold;
@@ -28,6 +31,7 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+        /* Estilos generales para botones */
         .btn {
             padding: 12px 24px;
             border-radius: 8px;
@@ -75,11 +79,13 @@
             background-color: #2563eb; /* blue-600 */
             transform: scale(1.02);
         }
+        /* Estilos para las rejillas de NFTs */
         .nft-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 1.5rem;
         }
+        /* Estilos para las tarjetas de NFT */
         .nft-card {
             background-color: #1f2937; /* gray-800 */
             padding: 1.5rem;
@@ -106,6 +112,7 @@
             margin-top: 1rem;
             width: 100%;
         }
+        /* Estilos para la rejilla de información */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -116,6 +123,7 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+        /* Estilos para el área de logs */
         .log-scroll-area {
             max-height: 200px;
             overflow-y: auto;
@@ -158,8 +166,9 @@
         }
     </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-blue-500 to-white min-h-screen flex items-center justify-center p-4">
     <div class="container mx-auto max-w-4xl bg-gray-900 text-white rounded-xl shadow-2xl p-8 space-y-8">
+        <!-- Encabezado de la Aplicación -->
         <header class="text-center">
             <h1 class="text-5xl font-extrabold text-blue-300 drop-shadow-lg mb-2">
                 Mercado NFT Descentralizado
@@ -192,6 +201,7 @@
                 class="mt-6 w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-md">
                 Conectar Billetera
             </button>
+            <!-- Botón para sugerir añadir la red a MetaMask -->
             <button id="add-network-button" class="btn secondary-btn mt-4 hidden">Añadir Red Hardhat a MetaMask</button>
         </section>
 
@@ -200,7 +210,7 @@
             <h2 class="text-3xl font-semibold text-blue-200 mb-4">
                 Crear un Nuevo NFT
             </h2>
-            <p class="text-gray-300 mb-4">Mintea un nuevo NFT directamente a tu billetera. Solo nombre y precio.</p>
+            <p class="text-gray-300 mb-4">Mintea un nuevo NFT directamente a tu billetera con imagen y metadatos.</p>
             <!-- Botón para abrir/cerrar el formulario de minteo -->
             <button id="toggle-mint-form" class="btn primary-btn w-full">Abrir Formulario de Minteo</button>
 
@@ -212,6 +222,16 @@
                         <label for="nft-name" class="block text-gray-300 text-sm font-bold mb-2">Nombre del NFT:</label>
                         <input type="text" id="nft-name" placeholder="Ej: Mi Obra de Arte Digital #1"
                             class="input-field" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="nft-description" class="block text-gray-300 text-sm font-bold mb-2">Descripción del NFT:</label>
+                        <textarea id="nft-description" placeholder="Una breve descripción de tu NFT..." rows="3"
+                                  class="input-field" required></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="nft-image" class="block text-gray-300 text-sm font-bold mb-2">Imagen del NFT:</label>
+                        <input type="file" id="nft-image" accept="image/*"
+                               class="input-field file-input" required>
                     </div>
                     <div class="mb-6">
                         <label for="nft-price" class="block text-gray-300 text-sm font-bold mb-2">Precio de Listado por Defecto (MTK):</label>

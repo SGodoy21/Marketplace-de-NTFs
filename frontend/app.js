@@ -1,10 +1,8 @@
-// Direcciones de los contratos desplegados (¡ACTUALIZA ESTAS DIRECCIONES CON LAS DE TU ÚLTIMO DESPLIEGUE!)
-// ¡IMPORTANTE! Asegúrate de que estas direcciones coincidan con las de tu último despliegue de Hardhat.
-const MY_TOKEN_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3"; // ¡ACTUALIZADO SEGÚN TU IMAGEN!
-const MY_NFT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";   // ¡ACTUALIZADO SEGÚN TU IMAGEN!
-const MARKETPLACE_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"; // ¡ACTUALIZADO SEGÚN TU IMAGEN!
+// Direcciones de los contratos desplegados
+const MY_TOKEN_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933"; 
+const MY_NFT_ADDRESS = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";   
+const MARKETPLACE_ADDRESS = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690"; 
 const LISTING_PRICE_DEFAULT = "100"; // Precio por defecto para listar, en MTK (100 MTK)
-const DEFAULT_TOKEN_URI_BASE = "https://example.com/metadata?name="; // Base URI para metadatos simples
 
 // ABIs de los contratos (se cargan desde los archivos JSON)
 let MyTokenABI;
@@ -30,11 +28,14 @@ let accountAddress;
 let mtkBalanceSpan;
 let logList;
 let marketplaceContainer;
+let marketplaceGrid; // Added for marketplace items
 
 let mintNftSection; // La sección completa de minteo
 let mintFormContainer; // El div que contiene el formulario de minteo
 let mintForm; // El formulario en sí
 let nftNameInput; // Input para el nombre del NFT
+let nftDescriptionInput; // Nuevo input para la descripción
+let nftImageInput; // Nuevo input para la imagen
 let nftPriceInput; // Input para el precio del NFT
 let toggleMintFormButton; // Botón para abrir/cerrar el formulario
 let createNftButton; // Botón "Crear NFT" dentro del formulario
@@ -62,16 +63,20 @@ function addLog(message, type = '') {
     const li = document.createElement('li');
     li.textContent = message;
     if (type) li.classList.add(type);
-    logList.prepend(li);
+    logList.prepend(li); // Añadir al principio para ver los más recientes
+    // Limitar el número de logs para evitar desbordamiento
+    if (logList.children.length > 50) {
+        logList.removeChild(logList.lastChild);
+    }
 }
 
 // ---------- Cargar ABIs (archivos JSON en el mismo folder)
 async function loadABIs() {
     try {
         const [tokenRes, nftRes, marketplaceRes] = await Promise.all([
-            fetch('MyToken.json'),
-            fetch('MyNFT.json'),
-            fetch('Marketplace.json'),
+            fetch('abi/MyToken.json'), // Assuming ABIs are in an 'abi' folder
+            fetch('abi/MyNFT.json'),
+            fetch('abi/Marketplace.json'),
         ]);
 
         MyTokenABI = await tokenRes.json();
@@ -90,12 +95,12 @@ function initializeContracts() {
     console.log("DEBUG: initializeContracts: Intentando inicializar contratos.");
     if (!provider) {
         addLog("❌ No hay proveedor para inicializar contratos.", 'error');
-        console.error("DEBUG: initializeContracts: El proveedor es nulo.");
+        console.error("DEBUG: initializeContracts: Provider is null.");
         return;
     }
     if (!signer) {
         addLog("❌ No hay firmante para inicializar contratos.", 'error');
-        console.error("DEBUG: initializeContracts: El firmante es nulo.");
+        console.error("DEBUG: initializeContracts: Signer is null.");
         return;
     }
 
@@ -107,37 +112,34 @@ function initializeContracts() {
     addLog("✅ Contratos inicializados.", 'success');
 
     // Eliminar todos los listeners anteriores para evitar duplicados al re-inicializar
+    // Esto es crucial para evitar que los eventos se disparen múltiples veces.
     if (marketplaceContract) {
         marketplaceContract.removeAllListeners();
-        marketplaceContract.hasListeners = false; // Restablecer la bandera
     }
     if (myTokenContract) {
         myTokenContract.removeAllListeners();
     }
-
+    
     // Adjuntar nuevos listeners
-    if (!marketplaceContract.hasListeners) {
-        listenToMarketplaceEvents();
-        marketplaceContract.hasListeners = true; // Marcar que los listeners ya están adjuntos
-    }
+    listenToMarketplaceEvents();
 
     // Adjuntar listener para el evento 'Transfer' de MyToken
     myTokenContract.on("Transfer", async (from, to, value) => {
         addLog(`🔔 Evento 'Transfer' de MTK: De ${from.slice(0,6)}... a ${to.slice(0,6)}... valor ${ethers.utils.formatUnits(value, 18)} MTK.`, 'info');
         // Si la cuenta actual está involucrada en la transferencia (como remitente o receptor), actualizar la UI
         if (currentAccount && (from.toLowerCase() === currentAccount.toLowerCase() || to.toLowerCase() === currentAccount.toLowerCase())) {
-            console.log(`DEBUG: Evento Transferencia involucra la cuenta actual (${currentAccount}), actualizando UI.`);
+            console.log(`DEBUG: Transfer event involves current account (${currentAccount}), updating UI.`);
             await updateUI();
         }
     });
     addLog("✅ Listener de eventos 'Transfer' de MyToken activado.", 'success');
 
-    console.log("DEBUG: initializeContracts: Contratos inicializados y listeners adjuntos.");
+    console.log("DEBUG: initializeContracts: Contracts initialized and listeners attached.");
 }
 
 // ---------- Conectar billetera MetaMask
 async function connectWallet() {
-    console.log("DEBUG: connectWallet: Función connectWallet llamada.");
+    console.log("DEBUG: connectWallet: connectWallet function called.");
     if (!window.ethereum) {
         alert("Necesitas tener MetaMask instalado.");
         addLog("❌ MetaMask no está instalado.", 'error');
@@ -172,25 +174,25 @@ async function connectWallet() {
 
         provider = new ethers.providers.Web3Provider(window.ethereum);
         signer = provider.getSigner();
-        console.log("DEBUG: connectWallet: Firmante después de la asignación:", signer);
+        console.log("DEBUG: connectWallet: Signer after assignment:", signer);
 
-        initializeContracts(); // Inicializar contratos con el nuevo signer
+        initializeContracts(); // Initialize contracts with the new signer
 
-        // Hacer visibles las secciones de NFT del usuario y minteo eliminando la clase 'hidden'
+        // Make user NFT and minting sections visible by removing the 'hidden' class
         if (mintNftSection) mintNftSection.classList.remove('hidden');
         if (userNftsCollectionSection) userNftsCollectionSection.classList.remove('hidden');
 
 
         await updateUI();
         await loadUserNFTs();
-        // NOTA: loadMarketplaceItems() NO se llama aquí para evitar la carga automática del marketplace.
-        // Se cargará solo cuando el usuario haga clic en el botón "Recargar Marketplace".
+        // NOTE: loadMarketplaceItems() is NOT called here to prevent automatic marketplace loading.
+        // It will only load when the user clicks the "Reload Marketplace" button.
 
         addLog("✅ Billetera conectada.", 'success');
-        console.log("DEBUG: connectWallet: Conexión exitosa y UI actualizada.");
+        console.log("DEBUG: connectWallet: Connection successful and UI updated.");
     } catch (e) {
         addLog("❌ Error conectando billetera: " + e.message, 'error');
-        console.error("DEBUG: connectWallet: Error en la conexión:", e);
+        console.error("DEBUG: connectWallet: Error in connection:", e);
         if (addNetworkButton) {
             addNetworkButton.style.display = 'block';
         }
@@ -201,22 +203,125 @@ async function connectWallet() {
     }
 }
 
-// ---------- Mostrar/ocultar formulario de minteo
+// ---------- Show/hide minting form
 function toggleMintFormVisibility() {
-    if (mintFormContainer) { // Asegurarse de que el contenedor exista
-        mintFormContainer.classList.toggle('hidden'); // Usa la clase 'hidden' de Tailwind
+    if (mintFormContainer) { // Ensure the container exists
+        mintFormContainer.classList.toggle('hidden'); // Use Tailwind's 'hidden' class
         if (!mintFormContainer.classList.contains('hidden')) {
-            // Si se muestra el formulario, limpiar inputs y enfocar el primero
+            // If the form is shown, clear inputs and focus the first one
             if (nftNameInput) nftNameInput.value = '';
+            if (nftDescriptionInput) nftDescriptionInput.value = '';
+            if (nftImageInput) nftImageInput.value = ''; // Clear file input
             if (nftPriceInput) nftPriceInput.value = LISTING_PRICE_DEFAULT;
             if (nftNameInput) nftNameInput.focus();
         }
     }
 }
 
-// ---------- Mintear NFT con formulario
-async function createAndMintNFT(e) { // Renombrado para mayor claridad, y recibe el evento
-    e.preventDefault(); // Previene el envío del formulario por defecto
+// ---------- Function to fetch IPFS metadata
+async function fetchIpfsMetadata(tokenURI) {
+    let name = "NFT Desconocido";
+    let description = "Este NFT no tiene descripción disponible.";
+    let imageUrl = "https://placehold.co/400x400/808080/FFFFFF?text=NFT+Image"; // Default image
+
+    // Check for simulated CIDs from deployFullProject.js (QmTEST...)
+    // If it's a simulated CID, use the placeholder logic directly without fetching
+    if (tokenURI && tokenURI.startsWith("ipfs://QmTEST")) {
+        const parts = tokenURI.split('/');
+        const lastPart = parts[parts.length - 1]; // e.g., "metadata_0.json"
+        const idMatch = lastPart.match(/(\d+)\.json$/);
+        const simulatedId = idMatch ? idMatch[1] : 'unknown';
+
+        name = `NFT Minteado #${simulatedId}`;
+        description = `Un NFT generado por el script de despliegue con el ID ${simulatedId}.`;
+        // Attempt to extract image URL from the simulated tokenURI if present
+        const urlParamsMatch = tokenURI.match(/image=(.*)/);
+        if (urlParamsMatch && urlParamsMatch[1]) {
+            try {
+                imageUrl = decodeURIComponent(urlParamsMatch[1]);
+            } catch (e) {
+                console.warn("Error decoding image URL from simulated tokenURI:", e);
+            }
+        } else {
+            // Fallback for simulated image if not in URL params
+            imageUrl = `https://placehold.co/400x400/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=NFT+${simulatedId}`;
+        }
+        
+        return { name, description, image: imageUrl };
+
+    } else if (tokenURI && tokenURI.startsWith("ipfs://")) {
+        // This is for real IPFS CIDs uploaded via Pinata
+        const ipfsHash = tokenURI.replace("ipfs://", "");
+        // Try multiple gateways for robustness
+        const metadataGateways = [
+            `https://ipfs.io/ipfs/${ipfsHash}`,
+            `https://gateway.pinata.cloud/ipfs/${ipfsHash}`,
+            `https://cloudflare-ipfs.com/ipfs/${ipfsHash}` // Another common gateway
+        ];
+
+        let metadata;
+        for (const gatewayUrl of metadataGateways) {
+            try {
+                const response = await fetch(gatewayUrl);
+                if (response.ok) {
+                    metadata = await response.json();
+                    console.log(`DEBUG: Metadatos IPFS cargados exitosamente desde: ${gatewayUrl}`);
+                    break; // Exit loop on first successful fetch
+                }
+            } catch (e) {
+                console.warn(`DEBUG: Fallo al intentar cargar metadatos desde ${gatewayUrl}:`, e);
+            }
+        }
+
+        if (metadata) {
+            name = metadata.name || name;
+            description = metadata.description || description;
+            
+            // Handle image URL with multiple gateways if it's an IPFS URI
+            if (metadata.image && metadata.image.startsWith("ipfs://")) {
+                const imageIpfsHash = metadata.image.replace("ipfs://", "");
+                const imageGateways = [
+                    `https://ipfs.io/ipfs/${imageIpfsHash}`,
+                    `https://gateway.pinata.cloud/ipfs/${imageIpfsHash}`,
+                    `https://cloudflare-ipfs.com/ipfs/${imageIpfsHash}`
+                ];
+
+                let imageFound = false;
+                for (const imgGatewayUrl of imageGateways) {
+                    try {
+                        const imgResponse = await fetch(imgGatewayUrl);
+                        if (imgResponse.ok) {
+                            imageUrl = imgGatewayUrl; // Use the successful gateway URL
+                            imageFound = true;
+                            console.log(`DEBUG: Imagen IPFS cargada exitosamente desde: ${imgGatewayUrl}`);
+                            break;
+                        }
+                    } catch (e) {
+                        console.warn(`DEBUG: Fallo al intentar cargar imagen desde ${imgGatewayUrl}:`, e);
+                    }
+                }
+                if (!imageFound) {
+                    addLog(`⚠️ No se pudo cargar la imagen para URI ${metadata.image} desde ningún gateway. Usando imagen por defecto.`, 'warning');
+                }
+            } else if (metadata.image) {
+                imageUrl = metadata.image; // Use as is if it's a regular URL
+            }
+        } else {
+            // If all metadata gateways fail
+            addLog(`⚠️ No se pudieron cargar los metadatos para URI ${tokenURI} desde ningún gateway. Usando valores por defecto.`, 'warning');
+        }
+    } else {
+        console.warn("TokenURI no es un formato IPFS reconocido o está vacío:", tokenURI);
+        addLog(`⚠️ TokenURI "${tokenURI}" no es un formato IPFS reconocido.`, 'warning');
+    }
+
+    return { name, description, image: imageUrl };
+}
+
+
+// ---------- Mint NFT with form (NOW WITH PINATA INTEGRATION)
+async function createAndMintNFT(e) { 
+    e.preventDefault(); // Prevent default form submission
 
     if (!signer || !currentAccount) {
         alert("Conecta tu billetera primero.");
@@ -228,72 +333,100 @@ async function createAndMintNFT(e) { // Renombrado para mayor claridad, y recibe
         return;
     }
 
-    const name = nftNameInput.value.trim(); // Usar nftNameInput
-    const price = nftPriceInput.value.trim(); // Usar nftPriceInput
+    const name = nftNameInput.value.trim(); 
+    const description = nftDescriptionInput.value.trim();
+    const imageFile = nftImageInput.files[0]; // Get the image file
+    const price = nftPriceInput.value.trim(); 
 
-    if (!name) { // Solo requerir el nombre
-        alert("Por favor, introduce un nombre para el NFT.");
+    if (!name || !description || !imageFile || !price) { 
+        addLog("Por favor, rellena todos los campos y selecciona una imagen para el NFT.", 'warning');
         return;
     }
 
-    try {
-        addLog(`⏳ Minteando NFT '${name}'...`, 'info');
+    addLog(`⏳ Minteando NFT '${name}'...`, 'info');
 
-        // Deshabilitar botones del formulario
+    try {
+        // Disable form buttons
         if (createNftButton) {
             createNftButton.disabled = true;
-            createNftButton.textContent = "Creando...";
+            createNftButton.textContent = "Subiendo a IPFS...";
         }
         if (cancelMintButton) {
             cancelMintButton.disabled = true;
         }
 
-        // Construye un URI simple con el nombre del NFT. NO sube a IPFS.
-        const tokenURI = `${DEFAULT_TOKEN_URI_BASE}${encodeURIComponent(name)}`;
-        console.log(`DEBUG: Minteando con tokenURI: ${tokenURI}`); // Log para verificar el URI
+        // Use FormData to send both file and text data to the backend
+        const formData = new FormData();
+        formData.append('image', imageFile); // 'image' must match the field name in multer setup on backend
+        formData.append('name', name);
+        formData.append('description', description);
+        formData.append('rarity', 'Común'); // You can add a rarity input later if needed
+        formData.append('price', price);
+        formData.append('creatorAddress', currentAccount);
 
-        const tx = await myNFTContract.safeMint(currentAccount, tokenURI, { gasLimit: 300000 });
-        const receipt = await tx.wait(); // Esperar el recibo para obtener el tokenId
+        // Send data to backend for IPFS upload and tokenURI generation
+        const response = await fetch('http://localhost:3001/mint-nft', { // Corrected endpoint
+            method: 'POST',
+            body: formData,
+        });
 
-        // Extraer el tokenId del evento Transfer
-        let tokenId = null;
-        for (const event of receipt.events) {
-            if (event.event === "Transfer") {
-                // El evento Transfer tiene from, to, tokenId
-                // Asegúrate de que sea el evento de tu NFT (from es 0x0 para minteo)
-                if (event.args.from === ethers.constants.AddressZero) {
-                    tokenId = event.args.tokenId.toString();
-                    break;
-                }
-            }
-            // Si el evento Transfer no es el de minteo, puede ser otro evento, lo ignoramos.
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error del backend: ${response.status} - ${errorData.error || 'Error desconocido'}`);
         }
 
+        const data = await response.json();
+        const tokenURI = data.tokenURI; // Get the real IPFS tokenURI from the backend
+        addLog(`✅ Backend generó Token URI: ${tokenURI}`, 'success');
+
+        // 3. Mint the NFT with the generated tokenURI
+        addLog(`⏳ Minteando NFT "${name}" en la blockchain...`, 'info');
+        if (createNftButton) {
+            createNftButton.textContent = "Minteando en Blockchain...";
+        }
+
+        const tx = await myNFTContract.safeMint(currentAccount, tokenURI, { gasLimit: 300000 });
+        const receipt = await tx.wait(); 
+
+        let tokenId = null;
+        // Look for the Transfer event to get the tokenId
+        for (const log of receipt.logs) {
+            try {
+                const parsedLog = myNFTContract.interface.parseLog(log);
+                // The Transfer event for minting from address(0)
+                if (parsedLog.name === "Transfer" && parsedLog.args.from === ethers.constants.AddressZero) {
+                    tokenId = parsedLog.args.tokenId.toString();
+                    break;
+                }
+            } catch (parseError) {
+                // Ignore logs that cannot be parsed by myNFTContract interface
+            }
+        }
+        
         if (tokenId) {
-            // Almacenar el precio de minteo asociado a este tokenId
-            mintedNftPrices[tokenId] = price;
+            mintedNftPrices[tokenId] = price; // Store the price for future reference
             addLog(`🎉 NFT '${name}' (ID: ${tokenId}) minteado exitosamente! Precio de listado guardado: ${price} MTK.`, 'success');
             alert(`NFT '${name}' (ID: ${tokenId}) minteado directamente a tu billetera.`);
         } else {
-            addLog(`🎉 NFT '${name}' minteado exitosamente, pero no se pudo obtener el ID.`, 'success');
+            addLog(`🎉 NFT '${name}' minteado exitosamente, pero no se pudo obtener el ID del evento.`, 'success');
             alert(`NFT '${name}' minteado directamente a tu billetera.`);
         }
 
-
-        // Limpiar formulario y ocultarlo
+        // Clear form and hide it
         if (mintFormContainer) mintFormContainer.classList.add('hidden');
         if (nftNameInput) nftNameInput.value = '';
-        if (nftPriceInput) nftPriceInput.value = LISTING_PRICE_DEFAULT; // Resetear al valor por defecto
+        if (nftDescriptionInput) nftDescriptionInput.value = '';
+        if (nftImageInput) nftImageInput.value = '';
+        if (nftPriceInput) nftPriceInput.value = LISTING_PRICE_DEFAULT; 
 
         await updateUI();
-        await loadUserNFTs(); // Recargar los NFTs del usuario para ver el nuevo
-        // NOTA: loadMarketplaceItems() NO se llama aquí para evitar la carga automática del marketplace.
+        await loadUserNFTs(); 
     } catch (error) {
         addLog("❌ Error minteando NFT: " + (error.message || error.code), 'error');
         alert("Error minteando NFT: " + (error.message || error.code));
         console.error(error);
     } finally {
-        // Re-habilitar botones del formulario
+        // Re-enable form buttons
         if (createNftButton) {
             createNftButton.disabled = false;
             createNftButton.textContent = "Crear NFT";
@@ -304,49 +437,57 @@ async function createAndMintNFT(e) { // Renombrado para mayor claridad, y recibe
     }
 }
 
-// ---------- Actualizar UI (balance y estado general)
+// ---------- Update UI (balance and general status)
 async function updateUI() {
-    console.log("DEBUG: updateUI: Función updateUI llamada.");
+    console.log("DEBUG: updateUI: updateUI function called.");
     if (!signer || !currentAccount) {
         addLog("ℹ️ No hay firmante o cuenta para actualizar la UI.", 'info');
+        console.log("DEBUG: updateUI: No signer or currentAccount. Exiting.");
         return;
     }
 
     try {
         if (!myTokenContract) {
             addLog("❌ Contrato MyToken no inicializado para actualizar el balance.", 'error');
-            console.error("DEBUG: updateUI: myTokenContract es nulo.");
+            console.error("DEBUG: updateUI: myTokenContract is null.");
             if (mtkBalanceSpan) mtkBalanceSpan.textContent = "Error";
             return;
         }
+        
+        console.log(`DEBUG: updateUI: Fetching balance for account: ${currentAccount}`);
         const balance = await myTokenContract.balanceOf(currentAccount);
-        if (mtkBalanceSpan) mtkBalanceSpan.textContent = parseFloat(ethers.utils.formatUnits(balance, 18)).toFixed(2);
+        console.log(`DEBUG: updateUI: Raw balance received: ${balance.toString()}`); // Log raw balance
+        
+        if (mtkBalanceSpan) {
+            mtkBalanceSpan.textContent = parseFloat(ethers.utils.formatUnits(balance, 18)).toFixed(2);
+        }
         addLog(`✅ Balance de MTK actualizado: ${mtkBalanceSpan ? mtkBalanceSpan.textContent : 'N/A'}`, 'success');
     } catch (e) {
-        addLog("❌ Error actualizando balance: " + e.message, 'error'); // Añadido log para errores
-        console.error("DEBUG: Error actualizando balance:", e);
+        addLog("❌ Error actualizando balance: " + e.message, 'error'); // Added log for errors
+        console.error("DEBUG: Error updating balance:", e);
+        if (mtkBalanceSpan) mtkBalanceSpan.textContent = "Error"; // Display error in UI
     }
 }
 
-// ---------- Cargar NFTs del usuario
+// ---------- Load user NFTs
 async function loadUserNFTs() {
     if (isUserNFTsLoading) {
-        console.warn("DEBUG: loadUserNFTs: Ya se está cargando, previniendo re-entrada.");
-        return; // Prevenir re-entrada
+        console.warn("DEBUG: loadUserNFTs: Already loading, preventing re-entry.");
+        return; // Prevent re-entry
     }
     isUserNFTsLoading = true;
-    console.log("DEBUG: loadUserNFTs: Iniciando llamada a la función.");
+    console.log("DEBUG: loadUserNFTs: Starting function call.");
 
     if (!signer || !currentAccount) {
         addLog("ℹ️ No hay firmante o cuenta para cargar los NFTs del usuario.", 'info');
-        console.log("DEBUG: loadUserNFTs: No hay firmante o currentAccount. Saliendo.");
+        console.log("DEBUG: loadUserNFTs: No signer or currentAccount. Exiting.");
         isUserNFTsLoading = false;
         return;
     }
 
     if (!userNftsGrid || !userNftsCountSpan) {
         addLog("❌ Error: Elementos DOM de NFT de usuario no encontrados.", 'error');
-        console.error("DEBUG-USER-NFT: ERROR: Elemento #user-nfts-grid o #user-nfts-count no encontrado en HTML.");
+        console.error("DEBUG-USER-NFT: ERROR: Element #user-nfts-grid or #user-nfts-count not found in HTML.");
         isUserNFTsLoading = false;
         return;
     }
@@ -354,7 +495,7 @@ async function loadUserNFTs() {
     try {
         if (!myNFTContract) {
             addLog("❌ Contrato MyNFT no inicializado para cargar los NFTs del usuario.", 'error');
-            console.error("DEBUG: loadUserNFTs: myNFTContract es nulo.");
+            console.error("DEBUG: loadUserNFTs: myNFTContract is null.");
             userNftsCountSpan.textContent = "Error";
             userNftsGrid.innerHTML = '<p class="text-gray-400">Error cargando tus NFTs.</p>';
             isUserNFTsLoading = false;
@@ -362,111 +503,117 @@ async function loadUserNFTs() {
         }
         if (!marketplaceContract) {
             addLog("❌ Contrato del Marketplace no inicializado para verificar el estado de listado de NFTs.", 'error');
-            console.warn("DEBUG-USER-NFT: marketplaceContract es nulo. No se puede verificar el estado de listado.");
+            console.warn("DEBUG-USER-NFT: marketplaceContract is null. Cannot verify listing status.");
         }
 
         const balance = await myNFTContract.balanceOf(currentAccount);
         userNftsCountSpan.textContent = balance.toString();
-        userNftsGrid.innerHTML = ''; // Limpiar la cuadrícula antes de añadir nuevos elementos
-        console.log(`DEBUG-USER-NFT: userNftsGrid limpiado. Balance reportado por el contrato: ${balance.toString()}`);
+        userNftsGrid.innerHTML = ''; // Clear the grid before adding new elements
+        console.log(`DEBUG-USER-NFT: userNftsGrid cleared. Balance reported by contract: ${balance.toString()}`);
 
         if (balance.eq(0)) {
             userNftsGrid.innerHTML = '<p class="text-gray-400">No tienes NFTs en tu billetera. ¡Mintea uno!</p>';
             addLog("🔄 No tienes NFTs en tu billetera.", 'info');
-            console.log("DEBUG-USER-NFT: El balance es 0. Mostrando mensaje de no NFTs.");
+            console.log("DEBUG-USER-NFT: Balance is 0. Showing no NFTs message.");
             isUserNFTsLoading = false;
             return;
         }
 
-        const uniqueTokenIdsRendered = new Set(); // Para detectar duplicados de renderizado reales
-        for (let i = 0; i < balance.toNumber(); i++) {
-            const tokenId = (await myNFTContract.tokenOfOwnerByIndex(currentAccount, i)).toString();
-            console.log(`DEBUG-USER-NFT: Iteración del bucle ${i}, tokenId obtenido: ${tokenId}`);
-
-            if (uniqueTokenIdsRendered.has(tokenId)) {
-                console.warn(`DEBUG-USER-NFT: ADVERTENCIA: Intentando renderizar tokenId duplicado ${tokenId} en la misma llamada a loadUserNFTs.`);
-                // Esto indicaría un problema con el contrato o el entorno Hardhat si tokenOfOwnerByIndex devuelve duplicados.
-                continue; // Saltar para evitar la duplicación visual si esto ocurre.
-            }
-            uniqueTokenIdsRendered.add(tokenId);
-
-            // Obtener el tokenURI para extraer el nombre
-            let nftName = `NFT #${tokenId}`; // Nombre por defecto
+        const uniqueTokenIdsRendered = new Set(); 
+        // Iterate through all possible token IDs to find those owned by the current account
+        // This is a workaround as ERC721 does not provide a direct way to get all token IDs of an owner.
+        // In a production environment, you would typically use a subgraph or an off-chain indexer.
+        const totalSupply = await myNFTContract.totalSupply();
+        for (let i = 0; i < totalSupply; i++) {
             try {
-                const tokenURI = await myNFTContract.tokenURI(tokenId);
-                console.log(`DEBUG-USER-NFT: TokenURI para NFT ID ${tokenId}: ${tokenURI}`);
-                if (tokenURI.startsWith(DEFAULT_TOKEN_URI_BASE)) {
-                    const urlParams = new URLSearchParams(tokenURI.split('?')[1]);
-                    const nameFromUri = urlParams.get('name');
-                    if (nameFromUri) {
-                        nftName = decodeURIComponent(nameFromUri);
+                const tokenId = i; // Assuming token IDs are sequential from 0
+                const owner = await myNFTContract.ownerOf(tokenId);
+                if (owner.toLowerCase() === currentAccount.toLowerCase()) {
+                    // It's an NFT owned by the user
+                    if (uniqueTokenIdsRendered.has(tokenId.toString())) {
+                        console.warn(`DEBUG-USER-NFT: WARNING: Attempting to render duplicate tokenId ${tokenId} in the same loadUserNFTs call.`);
+                        continue; 
                     }
-                }
-            } catch (uriError) {
-                console.warn(`DEBUG-USER-NFT: Error obteniendo o parseando tokenURI para NFT ID ${tokenId}: ${uriError.message}`);
-            }
+                    uniqueTokenIdsRendered.add(tokenId.toString());
 
-            let item;
-            let isListed = false;
-            let listedPrice = LISTING_PRICE_DEFAULT;
-            let listedSeller = '';
-
-            if (marketplaceContract) {
-                try {
-                    item = await marketplaceContract.listedItems(tokenId);
-                    isListed = item.isListed;
-                    if (isListed) {
-                        listedPrice = ethers.utils.formatUnits(item.price, 18);
-                        listedSeller = item.seller;
+                    // Get the tokenURI and IPFS metadata
+                    let nftMetadata = { name: `NFT #${tokenId}`, description: "Cargando descripción...", image: "https://placehold.co/400x400/808080/FFFFFF?text=Cargando..." };
+                    try {
+                        const tokenURI = await myNFTContract.tokenURI(tokenId);
+                        console.log(`DEBUG-USER-NFT: TokenURI for NFT ID ${tokenId}: ${tokenURI}`);
+                        nftMetadata = await fetchIpfsMetadata(tokenURI);
+                    } catch (uriError) {
+                        console.warn(`DEBUG-USER-NFT: Error getting or parsing tokenURI for NFT ID ${tokenId}: ${uriError.message}`);
                     }
-                    console.log(`DEBUG-USER-NFT: NFT ID ${tokenId} - isListed: ${isListed}, Precio: ${listedPrice}, Vendedor: ${listedSeller}`);
-                } catch (marketplaceError) {
-                    console.warn(`DEBUG-USER-NFT: Error obteniendo el estado de listado para NFT ID ${tokenId}: ${marketplaceError.message}`);
-                    isListed = false;
+
+                    let item;
+                    let isListed = false;
+                    let listedPrice = LISTING_PRICE_DEFAULT;
+                    let listedSeller = '';
+
+                    if (marketplaceContract) {
+                        try {
+                            item = await marketplaceContract.listedItems(tokenId);
+                            isListed = item.isListed;
+                            if (isListed) {
+                                listedPrice = ethers.utils.formatUnits(item.price, 18);
+                                listedSeller = item.seller;
+                            }
+                            console.log(`DEBUG-USER-NFT: NFT ID ${tokenId} - isListed: ${isListed}, Price: ${listedPrice}, Seller: ${listedSeller}`);
+                        } catch (marketplaceError) {
+                            console.warn(`DEBUG-USER-NFT: Error getting listing status for NFT ID ${tokenId}: ${marketplaceError.message}`);
+                            isListed = false;
+                        }
+                    }
+
+                    let buttonHTML;
+                    let statusText;
+                    // Use the price saved in mintedNftPrices if it exists, otherwise the default
+                    const priceForListing = mintedNftPrices[tokenId.toString()] || LISTING_PRICE_DEFAULT;
+
+                    if (isListed && listedSeller.toLowerCase() === currentAccount.toLowerCase()) {
+                        buttonHTML = `<button class="btn danger-btn" onclick="cancelListing(${tokenId})">Cancelar Listado</button>`;
+                        statusText = `Listado por ti por ${listedPrice} MTK`;
+                    } else if (isListed && listedSeller.toLowerCase() !== currentAccount.toLowerCase()) {
+                        buttonHTML = `<span class="text-gray-400 text-sm italic">Listado por otro (${listedSeller.slice(0,6)}...)</span>`;
+                        statusText = `Listado por ${listedSeller.slice(0,6)}... por ${listedPrice} MTK`;
+                    } else {
+                        buttonHTML = `<button class="btn success-btn" onclick="listNFT(${tokenId}, ${priceForListing})">Listar por ${priceForListing} MTK</button>`;
+                        statusText = "No listado";
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = 'nft-card';
+                    div.innerHTML = `
+                        <img src="${nftMetadata.image}" alt="${nftMetadata.name}" class="w-full h-48 object-cover rounded-md mb-4 border border-blue-500" onerror="this.onerror=null;this.src='https://placehold.co/400x400/808080/FFFFFF?text=Error+Loading';">
+                        <h3 class="text-xl font-bold text-blue-300">${nftMetadata.name} (#${tokenId})</h3>
+                        <p class="text-gray-400 text-sm mb-2">${nftMetadata.description}</p>
+                        <p>Estado: <span class="highlight">${statusText}</span></p>
+                        <div class="flex flex-col mt-4"> ${buttonHTML} </div>
+                    `;
+                    userNftsGrid.appendChild(div);
+                    console.log(`DEBUG-USER-NFT: Card added for NFT ID: ${tokenId}`);
                 }
+            } catch (e) {
+                // ownerOf will revert if the token ID does not exist or is not valid.
+                // This is expected if iterating through a range of potential token IDs.
+                // console.log(`Token ID ${i} does not exist or is not owned by anyone.`);
             }
-
-            let buttonHTML;
-            let statusText;
-            // Usar el precio guardado en mintedNftPrices si existe, de lo contrario el default
-            const priceForListing = mintedNftPrices[tokenId] || LISTING_PRICE_DEFAULT;
-
-            if (isListed && listedSeller.toLowerCase() === currentAccount.toLowerCase()) {
-                buttonHTML = `<button class="btn danger-btn" onclick="cancelListing(${tokenId})">Cancelar Listado</button>`;
-                statusText = `Listado por ti por ${listedPrice} MTK`;
-            } else if (isListed && listedSeller.toLowerCase() !== currentAccount.toLowerCase()) {
-                // Este caso no debería ocurrir para NFTs en la billetera del usuario,
-                // ya que no poseerían un NFT listado por otra persona.
-                buttonHTML = `<span class="text-gray-400 text-sm italic">Listado por otro (${listedSeller.slice(0,6)}...)</span>`;
-                statusText = `Listado por ${listedSeller.slice(0,6)}... por ${listedPrice} MTK`;
-            } else {
-                buttonHTML = `<button class="btn success-btn" onclick="listNFT(${tokenId}, ${priceForListing})">Listar por ${priceForListing} MTK</button>`;
-                statusText = "No listado";
-            }
-
-            const div = document.createElement('div');
-            div.className = 'nft-card';
-            div.innerHTML = `
-                <h3>${nftName} (#${tokenId})</h3>
-                <p>Estado: <span class="highlight">${statusText}</span></p>
-                ${buttonHTML}
-            `;
-            userNftsGrid.appendChild(div);
-            console.log(`DEBUG-USER-NFT: Tarjeta añadida para NFT ID: ${tokenId}`);
         }
-        addLog(`✅ NFTs del usuario cargados. Total: ${balance.toString()}`, 'success');
-        console.log("DEBUG: loadUserNFTs: Función terminada exitosamente.");
+
+        addLog(`✅ NFTs del usuario cargados. Total: ${uniqueTokenIdsRendered.size}`, 'success');
+        console.log("DEBUG: loadUserNFTs: Function finished successfully.");
     } catch (e) {
         addLog("❌ Error cargando NFTs del usuario: " + e.message, 'error');
         console.error("DEBUG: Error cargando NFTs del usuario:", e);
         userNftsGrid.innerHTML = '<p class="text-gray-400">Error cargando tus NFTs.</p>';
     } finally {
-        isUserNFTsLoading = false; // Resetear bandera
-        console.log("DEBUG: loadUserNFTs: Función finalizada, bandera reseteada.");
+        isUserNFTsLoading = false; // Reset flag
+        console.log("DEBUG: loadUserNFTs: Function finished, flag reset.");
     }
 }
 
-// ---------- Listar NFT
+// ---------- List NFT
 async function listNFT(tokenId, price) {
     if (!signer) {
         alert("Conecta tu billetera primero.");
@@ -481,6 +628,7 @@ async function listNFT(tokenId, price) {
     try {
         addLog(`⏳ Listando NFT ID ${tokenId} por ${price} MTK...`, 'info');
 
+        // Disable all action buttons to prevent multiple transactions
         document.querySelectorAll('.nft-card .btn').forEach(btn => btn.disabled = true);
         if (listAllUserNftsButton) listAllUserNftsButton.disabled = true;
 
@@ -496,18 +644,19 @@ async function listNFT(tokenId, price) {
 
         await updateUI();
         await loadUserNFTs();
-        await loadMarketplaceItems(); // Recargar el marketplace para mostrar el nuevo NFT listado
+        await loadMarketplaceItems(); // Reload the marketplace to show the new listed NFT
     } catch (error) {
         addLog("❌ Error listando NFT: " + (error.message || error.code), 'error');
         alert("Error listando NFT: " + (error.message || error.code));
         console.error(error);
     } finally {
+        // Re-enable buttons
         document.querySelectorAll('.nft-card .btn').forEach(btn => btn.disabled = false);
         if (listAllUserNftsButton) listAllUserNftsButton.disabled = false;
     }
 }
 
-// ---------- Comprar NFT
+// ---------- Buy NFT
 async function buyNFT(tokenId, price) {
     if (!signer) {
         alert("Conecta tu billetera primero.");
@@ -531,8 +680,10 @@ async function buyNFT(tokenId, price) {
 
         addLog(`⏳ Comprando NFT ID ${tokenId} por ${price} MTK...`, 'info');
 
+        // Disable all action buttons
         document.querySelectorAll('.nft-card .btn').forEach(btn => btn.disabled = true);
         if (listAllUserNftsButton) listAllUserNftsButton.disabled = true;
+
 
         const priceInWei = ethers.utils.parseUnits(price.toString(), 18);
         const approveTx = await myTokenContract.approve(MARKETPLACE_ADDRESS, priceInWei);
@@ -553,12 +704,13 @@ async function buyNFT(tokenId, price) {
         alert("Error comprando NFT: " + (e.message || e.code));
         console.error(e);
     } finally {
+        // Re-enable buttons
         document.querySelectorAll('.nft-card .btn').forEach(btn => btn.disabled = false);
         if (listAllUserNftsButton) listAllUserNftsButton.disabled = false;
     }
 }
 
-// ---------- Cancelar listado NFT
+// ---------- Cancel NFT listing
 async function cancelListing(tokenId) {
     if (!signer) {
         alert("Conecta tu billetera primero.");
@@ -573,6 +725,7 @@ async function cancelListing(tokenId) {
     try {
         addLog(`⏳ Cancelando listado para NFT ID ${tokenId}...`, 'info');
 
+        // Disable all action buttons
         document.querySelectorAll('.nft-card .btn').forEach(btn => btn.disabled = true);
         if (listAllUserNftsButton) listAllUserNftsButton.disabled = true;
 
@@ -590,46 +743,51 @@ async function cancelListing(tokenId) {
         alert("Error cancelando listado: " + (e.message || e.code));
         console.error(e);
     } finally {
+        // Re-enable buttons
         document.querySelectorAll('.nft-card .btn').forEach(btn => btn.disabled = false);
         if (listAllUserNftsButton) listAllUserNftsButton.disabled = false;
     }
 }
 
-// ---------- Cargar NFTs listados en el marketplace
+// ---------- Load listed NFTs in the marketplace
 async function loadMarketplaceItems() {
     if (isMarketplaceLoading) {
-        console.warn("DEBUG-LMI: Ya se está cargando, previniendo re-entrada.");
-        return; // Prevenir re-entrada
+        console.warn("DEBUG-LMI: Already loading, preventing re-entry.");
+        return; // Prevent re-entry
     }
     isMarketplaceLoading = true;
     addLog("Cargando ítems del marketplace...", 'info');
-    console.log("DEBUG-LMI: Iniciando función loadMarketplaceItems.");
+    console.log("DEBUG-LMI: Starting loadMarketplaceItems function.");
     
-    let marketplaceGrid = document.getElementById('marketplace-grid'); // Obtener directamente por ID
+    // Ensure marketplaceGrid is defined
+    if (!marketplaceGrid) {
+        marketplaceGrid = document.getElementById('marketplace-grid'); 
+    }
+
     if (!marketplaceGrid) {
         addLog("❌ Error: Contenedor del Marketplace (ID 'marketplace-grid') no encontrado.", 'error');
-        console.error("DEBUG-LMI: ERROR: Elemento #marketplace-grid no encontrado en HTML.");
+        console.error("DEBUG-LMI: ERROR: Element #marketplace-grid not found in HTML.");
         isMarketplaceLoading = false;
         return;
     }
     
-    // Limpiar el contenido de la cuadrícula antes de cargar nuevos ítems para evitar duplicación
+    // Clear grid content before loading new items to avoid duplication
     marketplaceGrid.innerHTML = '<p class="text-gray-400">Cargando ítems...</p>';
-    console.log("DEBUG-LMI: Contenido del Marketplace limpiado.");
+    console.log("DEBUG-LMI: Marketplace content cleared.");
 
-    if (!signer || !marketplaceContract || !myNFTContract) { // Added myNFTContract check
+    if (!signer || !marketplaceContract || !myNFTContract) { 
         marketplaceGrid.innerHTML = '<p class="text-gray-400">Marketplace no disponible o billetera no conectada.</p>';
         addLog("❌ Marketplace no disponible o billetera no conectada para cargar ítems.", 'error');
-        console.error("DEBUG-LMI: Signer, marketplaceContract, o myNFTContract es nulo.");
+        console.error("DEBUG-LMI: Signer, marketplaceContract, or myNFTContract is null.");
         isMarketplaceLoading = false;
         return;
     }
 
     try {
-        console.log("DEBUG-LMI: Intentando obtener IDs listados del contrato.");
+        console.log("DEBUG-LMI: Attempting to get listed IDs from contract.");
         const tokenIdsBN = await marketplaceContract.getListedTokenIds();
-        const tokenIds = tokenIdsBN.map(bn => bn.toNumber());
-        marketplaceGrid.innerHTML = ''; // Limpiar de nuevo después de obtener los IDs, antes de añadir tarjetas
+        const tokenIds = tokenIdsBN.map(bn => Number(bn)); // Convert BigNumber to Number
+        marketplaceGrid.innerHTML = ''; // Clear again after getting IDs, before adding cards
 
         if (tokenIds.length === 0) {
             marketplaceGrid.innerHTML = '<p class="text-gray-400">No hay NFTs listados en este momento.</p>';
@@ -638,7 +796,7 @@ async function loadMarketplaceItems() {
             return;
         }
 
-        console.log("DEBUG-LMI: Iterando sobre IDs listados para renderizar.");
+        console.log("DEBUG-LMI: Iterating over listed IDs to render.");
         for (let tokenId of tokenIds) {
             const item = await marketplaceContract.listedItems(tokenId);
             if (!item.isListed) {
@@ -649,35 +807,29 @@ async function loadMarketplaceItems() {
             const seller = item.seller;
             const priceMTK = ethers.utils.formatUnits(item.price, 18);
 
-            // Obtener el tokenURI para extraer el nombre
-            let nftName = `NFT #${tokenId}`; // Nombre por defecto
+            // Get the tokenURI and IPFS metadata
+            let nftMetadata = { name: `NFT #${tokenId}`, description: "Cargando descripción...", image: "https://placehold.co/400x400/808080/FFFFFF?text=Cargando..." };
             try {
                 const tokenURI = await myNFTContract.tokenURI(tokenId);
-                console.log(`DEBUG-LMI: TokenURI para NFT ID ${tokenId}: ${tokenURI}`);
-                if (tokenURI.startsWith(DEFAULT_TOKEN_URI_BASE)) {
-                    const urlParams = new URLSearchParams(tokenURI.split('?')[1]);
-                    const nameFromUri = urlParams.get('name');
-                    if (nameFromUri) {
-                        nftName = decodeURIComponent(nameFromUri);
-                    }
-                }
+                console.log(`DEBUG-LMI: TokenURI for NFT ID ${tokenId}: ${tokenURI}`);
+                nftMetadata = await fetchIpfsMetadata(tokenURI);
             } catch (uriError) {
-                console.warn(`DEBUG-LMI: Error obteniendo o parseando tokenURI para NFT ID ${tokenId}: ${uriError.message}`);
+                console.warn(`DEBUG-LMI: Error getting or parsing tokenURI for NFT ID ${tokenId}: ${uriError.message}`);
             }
 
             let buttonHTML;
             if (currentAccount && seller.toLowerCase() === currentAccount.toLowerCase()) {
-                // Si el NFT pertenece a la cuenta conectada actualmente
                 buttonHTML = `<button class="btn danger-btn" onclick="cancelListing(${tokenId})">Cancelar Listado</button>`;
             } else {
-                // Si el NFT pertenece a otra cuenta
                 buttonHTML = `<button class="btn info-btn" onclick="buyNFT(${tokenId}, '${priceMTK}')">Comprar</button>`;
             }
 
             const card = document.createElement('div');
             card.className = 'nft-card';
             card.innerHTML = `
-                <h3>${nftName} (#${tokenId})</h3>
+                <img src="${nftMetadata.image}" alt="${nftMetadata.name}" class="w-full h-48 object-cover rounded-md mb-4 border border-blue-500" onerror="this.onerror=null;this.src='https://placehold.co/400x400/808080/FFFFFF?text=Error+Loading';">
+                <h3 class="text-xl font-bold text-blue-300">${nftMetadata.name} (#${tokenId})</h3>
+                <p class="text-gray-400 text-sm mb-2">${nftMetadata.description}</p>
                 <p>Precio: <span class="highlight">${priceMTK}</span> MTK</p>
                 <p>Vendedor: <span class="truncate">${seller.slice(0,6)}...${seller.slice(-4)}</span></p>
                 ${buttonHTML}
@@ -692,12 +844,12 @@ async function loadMarketplaceItems() {
         console.error("DEBUG-LMI: Error cargando marketplace:", e);
         marketplaceGrid.innerHTML = '<p class="text-gray-400">Error cargando NFTs.</p>';
     } finally {
-        isMarketplaceLoading = false; // Resetear bandera
-        console.log("DEBUG-LMI: Función finalizada, bandera reseteada.");
+        isMarketplaceLoading = false; // Reset flag
+        console.log("DEBUG-LMI: Function finished, flag reset.");
     }
 }
 
-// ---------- Listar todos los NFTs del usuario si no están listados
+// ---------- List all user NFTs if not listed
 async function listAllUserNFTsIfNotListed() {
     if (!signer || !currentAccount) {
         alert("Conecta tu billetera primero.");
@@ -719,15 +871,24 @@ async function listAllUserNFTsIfNotListed() {
         const balance = await myNFTContract.balanceOf(currentAccount);
         let listedCount = 0;
 
-        for (let i = 0; i < balance.toNumber(); i++) {
-            const tokenId = await myNFTContract.tokenOfOwnerByIndex(currentAccount, i);
-            const item = await marketplaceContract.listedItems(tokenId);
-            if (!item.isListed) {
-                // Usar el precio guardado en mintedNftPrices si existe, de lo contrario el default
-                const priceToUse = mintedNftPrices[tokenId.toString()] || LISTING_PRICE_DEFAULT;
-                addLog(`⏳ Listando NFT ID ${tokenId} con precio ${priceToUse} MTK...`, 'info');
-                await listNFT(tokenId.toString(), priceToUse);
-                listedCount++;
+        const totalSupply = await myNFTContract.totalSupply();
+        for (let i = 0; i < totalSupply; i++) {
+            try {
+                const tokenId = i;
+                const owner = await myNFTContract.ownerOf(tokenId);
+                if (owner.toLowerCase() === currentAccount.toLowerCase()) {
+                    const item = await marketplaceContract.listedItems(tokenId);
+                    if (!item.isListed) {
+                        // Use the price saved in mintedNftPrices if it exists, otherwise the default
+                        const priceToUse = mintedNftPrices[tokenId.toString()] || LISTING_PRICE_DEFAULT;
+                        addLog(`⏳ Listando NFT ID ${tokenId} con precio ${priceToUse} MTK...`, 'info');
+                        await listNFT(tokenId.toString(), priceToUse);
+                        listedCount++;
+                    }
+                }
+            } catch (e) {
+                // ownerOf will revert if the token ID does not exist or is not valid.
+                // This is expected if iterating through a range of potential token IDs.
             }
         }
         addLog(`🎉 ${listedCount} nuevos NFTs listados.`, 'success');
@@ -744,14 +905,14 @@ async function listAllUserNFTsIfNotListed() {
         }
         await updateUI();
         await loadUserNFTs();
-        await loadMarketplaceItems(); // Recargar el marketplace después de listar todos los NFTs
+        await loadMarketplaceItems(); // Reload the marketplace after listing all NFTs
     }
 }
 
-// ---------- Eventos del marketplace para actualizar UI
+// ---------- Marketplace events to update UI
 function listenToMarketplaceEvents() {
     if (marketplaceContract) {
-        // Eliminar listeners anteriores para evitar duplicados
+        // Remove previous listeners to avoid duplicates
         marketplaceContract.removeAllListeners();
 
         marketplaceContract.on("NFTListed", async (tokenId, seller, price) => {
@@ -777,11 +938,11 @@ function listenToMarketplaceEvents() {
 
         addLog("✅ Listeners de eventos del Marketplace activados.", 'success');
     } else {
-        console.warn("DEBUG: No se pudieron adjuntar los listeners de eventos: marketplaceContract es nulo.");
+        console.warn("DEBUG: Could not attach event listeners: marketplaceContract is null.");
     }
 }
 
-// ---------- Añadir red Hardhat a MetaMask
+// ---------- Add Hardhat network to MetaMask
 async function addHardhatNetwork() {
     if (!window.ethereum) {
         alert("No tienes MetaMask instalado.");
@@ -808,7 +969,7 @@ async function addHardhatNetwork() {
     }
 }
 
-// ---------- Detectar cambio de cuenta y actualizar todo
+// ---------- Detect account change and update everything
 if (window.ethereum) {
     window.ethereum.on('accountsChanged', async (accounts) => {
         addLog(`🔄 Cambio de cuenta detectado.`, 'info');
@@ -822,10 +983,10 @@ if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
         signer = provider.getSigner();
 
-        const marketplaceGrid = document.getElementById('marketplace-grid');
-        const userNftsGridElement = userNftsGrid;
+        const marketplaceGridElement = document.getElementById('marketplace-grid');
+        const userNftsGridElement = document.getElementById('user-nfts-grid');
 
-        if (marketplaceGrid) marketplaceGrid.innerHTML = '<p class="text-gray-400">Cargando ítems...</p>';
+        if (marketplaceGridElement) marketplaceGridElement.innerHTML = '<p class="text-gray-400">Cargando ítems...</p>';
         if (userNftsGridElement) userNftsGridElement.innerHTML = '<p class="text-gray-400">Cargando tus NFTs...</p>';
 
         initializeContracts();
@@ -835,7 +996,7 @@ if (window.ethereum) {
 
         await updateUI();
         await loadUserNFTs();
-        // NOTA: loadMarketplaceItems() NO se llama aquí para evitar la carga automática del marketplace.
+        // NOTE: loadMarketplaceItems() is NOT called here to prevent automatic marketplace loading.
         addLog(`✅ UI actualizada para la cuenta: ${currentAccount.slice(0,6)}...`, 'success');
     });
 
@@ -845,20 +1006,23 @@ if (window.ethereum) {
     });
 }
 
-// ---------- Carga inicial de la aplicación cuando el DOM está listo
+// ---------- Initial application load when DOM is ready
 window.addEventListener('DOMContentLoaded', async () => {
-    // Obtener referencias a los elementos DOM aquí, cuando se garantiza que existen.
+    // Get DOM element references here, when they are guaranteed to exist.
     connectButton = document.getElementById('connect-button');
     connectStatus = document.getElementById('connect-status');
     accountAddress = document.getElementById('account-address');
     mtkBalanceSpan = document.getElementById('mtk-balance');
     logList = document.getElementById('log-list');
     marketplaceContainer = document.getElementById('marketplace-container');
+    marketplaceGrid = document.getElementById('marketplace-grid'); // Assign marketplaceGrid here
 
     mintNftSection = document.getElementById('mint-nft-section');
     mintFormContainer = document.getElementById('mint-form-container');
     mintForm = document.getElementById('mint-form');
     nftNameInput = document.getElementById('nft-name');
+    nftDescriptionInput = document.getElementById('nft-description'); // Assign new input
+    nftImageInput = document.getElementById('nft-image'); // Assign new input
     nftPriceInput = document.getElementById('nft-price');
     toggleMintFormButton = document.getElementById('toggle-mint-form');
     createNftButton = document.getElementById('create-nft-button');
@@ -872,8 +1036,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     loadMarketplaceButton = document.getElementById('load-marketplace-button');
     listAllUserNftsButton = document.getElementById('list-all-user-nfts-button'); 
 
-    await loadABIs();
+    await loadABIs(); // Load ABIs first
 
+    // Attach connect button listener. No automatic connection here.
     if (connectButton) connectButton.addEventListener('click', connectWallet);
     
     if (addNetworkButton) addNetworkButton.addEventListener('click', addHardhatNetwork);
@@ -883,14 +1048,16 @@ window.addEventListener('DOMContentLoaded', async () => {
         await listAllUserNFTsIfNotListed();
     });
 
+    // Listeners for the minting form
     if (toggleMintFormButton) toggleMintFormButton.addEventListener('click', toggleMintFormVisibility);
-    if (mintForm) mintForm.addEventListener('submit', createAndMintNFT);
-    if (cancelMintButton) cancelMintButton.addEventListener('click', toggleMintFormVisibility);
+    if (mintForm) mintForm.addEventListener('submit', createAndMintNFT); // Form submission calls createAndMintNFT
+    if (cancelMintButton) cancelMintButton.addEventListener('click', toggleMintFormVisibility); // Cancel also hides the form
 
 });
 
 
-// ---------- Funciones expuestas globalmente para botones dinámicos (onclick en HTML)
+// ---------- Functions globally exposed for dynamic buttons (onclick in HTML)
 window.listNFT = listNFT;
 window.buyNFT = buyNFT;
 window.cancelListing = cancelListing;
+// window.burnNFT = burnNFT; // Removed for now

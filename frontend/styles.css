@@ -151,6 +151,9 @@ section h2 {
 .primary-btn { background-color: #3b82f6; } /* Azul */
 .primary-btn:hover:not(:disabled) { background-color: #2563eb; }
 
+.secondary-btn { background-color: #6b7280; } /* Gris */
+.secondary-btn:hover:not(:disabled) { background-color: #4b5563; }
+
 .success-btn { background-color: #10b981; } /* Verde */
 .success-btn:hover:not(:disabled) { background-color: #059669; }
 
@@ -194,8 +197,7 @@ section h2 {
     margin-bottom: 8px;
 }
 
-.nft-card .buy-button {
-    width: 100%;
+.nft-card .btn {
     margin-top: 15px;
     /* Los estilos de .btn ya se aplicarán, solo ajustar si es necesario */
 }
@@ -240,6 +242,68 @@ section h2 {
     color: #60a5fa; /* Azul claro */
 }
 
+/* Estilos para el formulario de minteo */
+#mint-form-container {
+    /* Ya tiene estilos inline, pero aquí puedes añadir más si es necesario */
+}
+
+#mint-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #a0aec0;
+}
+
+#mint-form input[type="text"],
+#mint-form input[type="number"],
+#mint-form textarea { /* Added textarea */
+    background-color: #2d3748; /* gris oscuro */
+    color: #e2e8f0; /* blanco suave */
+    border: 1px solid #4a5568; /* gris medio */
+    padding: 10px 15px;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+#mint-form input[type="text"]:focus,
+#mint-form input[type="number"]:focus,
+#mint-form textarea:focus { /* Added textarea */
+    outline: none;
+    border-color: #60a5fa; /* azul claro */
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.5);
+}
+
+/* Style for file input to make it consistent */
+#mint-form input[type="file"] {
+    background-color: #2d3748; /* Dark gray */
+    color: #e2e8f0; /* Soft white */
+    border: 1px solid #4a5568; /* Medium gray */
+    padding: 10px 15px;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    /* Custom styling for file input button if needed */
+    cursor: pointer;
+}
+
+#mint-form input[type="file"]::-webkit-file-upload-button {
+    background-color: #4a5568; /* Darker gray for button */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+}
+
+#mint-form input[type="file"]::-webkit-file-upload-button:hover {
+    background-color: #6b7280; /* Lighter gray on hover */
+}
+
 
 /* Media Queries para responsividad */
 @media (min-width: 768px) {
@@ -256,31 +320,3 @@ section h2 {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Columnas más grandes en pantallas grandes */
     }
 }
-
-.btn-comprar {
-  background-color: #007bff; /* Azul */
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-cancelar {
-  background-color: #dc3545; /* Rojo */
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-/* Opcional: efecto hover */
-.btn-comprar:hover {
-  background-color: #0056b3;
-}
-
-.btn-cancelar:hover {
-  background-color: #a71d2a;
-}
-
