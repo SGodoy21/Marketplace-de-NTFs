@@ -1,7 +1,10 @@
-// Direcciones de los contratos desplegados
-const MY_TOKEN_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933"; 
-const MY_NFT_ADDRESS = "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E";   
-const MARKETPLACE_ADDRESS = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690"; 
+// Direcciones de los contratos desplegados (¡ACTUALIZA ESTAS DIRECCIONES CON LAS DE TU ÚLTIMO DESPLIEGUE!)
+// ¡IMPORTANTE! Asegúrate de que estas direcciones coincidan con las de tu último despliegue de Hardhat.
+// Estas son direcciones de ejemplo, DEBES REEMPLAZARLAS con las que te dé tu script de despliegue.
+const MY_TOKEN_ADDRESS = "0x5f3f1dBD7B74C6B46e8c44f98792A1dAf8d69154"; 
+const MY_NFT_ADDRESS = "0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f";   
+const MARKETPLACE_ADDRESS = "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07"; 
+
 const LISTING_PRICE_DEFAULT = "100"; // Precio por defecto para listar, en MTK (100 MTK)
 
 // ABIs de los contratos (se cargan desde los archivos JSON)
@@ -25,25 +28,24 @@ const mintedNftPrices = {};
 let connectButton;
 let connectStatus;
 let accountAddress;
-let mtkBalanceSpan;
+let mtkBalanceSpan; // Usado para mostrar el balance de MTK
 let logList;
-let marketplaceContainer;
-let marketplaceGrid; // Added for marketplace items
+let marketplaceGrid; 
 
-let mintNftSection; // La sección completa de minteo
-let mintFormContainer; // El div que contiene el formulario de minteo
-let mintForm; // El formulario en sí
-let nftNameInput; // Input para el nombre del NFT
-let nftDescriptionInput; // Nuevo input para la descripción
-let nftImageInput; // Nuevo input para la imagen
-let nftPriceInput; // Input para el precio del NFT
-let toggleMintFormButton; // Botón para abrir/cerrar el formulario
-let createNftButton; // Botón "Crear NFT" dentro del formulario
-let cancelMintButton; // Botón "Cancelar" dentro del formulario
+let mintNftSection; 
+let mintFormContainer; 
+let mintForm; 
+let nftNameInput; 
+let nftDescriptionInput; 
+let nftImageInput; 
+let nftPriceInput; 
+let toggleMintFormButton; 
+let createNftButton; 
+let cancelMintButton; 
 
-let userNftsCollectionSection; // La sección completa de la colección del usuario
-let userNftsGrid; // La cuadrícula donde se muestran los NFTs del usuario
-let userNftsCountSpan; // El span que muestra el conteo de NFTs del usuario
+let userNftsCollectionSection; 
+let userNftsGrid; 
+let userNftsCountSpan; 
 
 let addNetworkButton;
 let loadMarketplaceButton;
@@ -74,7 +76,7 @@ function addLog(message, type = '') {
 async function loadABIs() {
     try {
         const [tokenRes, nftRes, marketplaceRes] = await Promise.all([
-            fetch('abi/MyToken.json'), // Assuming ABIs are in an 'abi' folder
+            fetch('abi/MyToken.json'), // Asumiendo que los ABIs están en una carpeta 'abi'
             fetch('abi/MyNFT.json'),
             fetch('abi/Marketplace.json'),
         ]);
@@ -85,23 +87,27 @@ async function loadABIs() {
 
         addLog("✅ ABIs cargados correctamente.", 'success');
     } catch (e) {
-        addLog("❌ Error cargando ABIs: " + e.message, 'error');
+        addLog("❌ Error cargando ABIs: " + e.message + ". Asegúrate de que los archivos JSON estén en la carpeta 'abi'.", 'error');
         console.error(e);
     }
 }
 
 // ---------- Inicializar contratos con el signer
-function initializeContracts() {
+async function initializeContracts() { // Made async to await signer
     console.log("DEBUG: initializeContracts: Intentando inicializar contratos.");
     if (!provider) {
         addLog("❌ No hay proveedor para inicializar contratos.", 'error');
         console.error("DEBUG: initializeContracts: Provider is null.");
         return;
     }
+    // Ensure signer is available before initializing contracts
     if (!signer) {
-        addLog("❌ No hay firmante para inicializar contratos.", 'error');
-        console.error("DEBUG: initializeContracts: Signer is null.");
-        return;
+        signer = await provider.getSigner(); // Get signer if not already available
+        if (!signer) {
+            addLog("❌ No hay firmante para inicializar contratos.", 'error');
+            console.error("DEBUG: initializeContracts: Signer is null after attempt.");
+            return;
+        }
     }
 
     // Inicializar instancias de contratos
@@ -176,7 +182,7 @@ async function connectWallet() {
         signer = provider.getSigner();
         console.log("DEBUG: connectWallet: Signer after assignment:", signer);
 
-        initializeContracts(); // Initialize contracts with the new signer
+        await initializeContracts(); // Initialize contracts with the new signer
 
         // Make user NFT and minting sections visible by removing the 'hidden' class
         if (mintNftSection) mintNftSection.classList.remove('hidden');
@@ -227,25 +233,13 @@ async function fetchIpfsMetadata(tokenURI) {
     // Check for simulated CIDs from deployFullProject.js (QmTEST...)
     // If it's a simulated CID, use the placeholder logic directly without fetching
     if (tokenURI && tokenURI.startsWith("ipfs://QmTEST")) {
-        const parts = tokenURI.split('/');
-        const lastPart = parts[parts.length - 1]; // e.g., "metadata_0.json"
-        const idMatch = lastPart.match(/(\d+)\.json$/);
-        const simulatedId = idMatch ? idMatch[1] : 'unknown';
-
-        name = `NFT Minteado #${simulatedId}`;
-        description = `Un NFT generado por el script de despliegue con el ID ${simulatedId}.`;
-        // Attempt to extract image URL from the simulated tokenURI if present
-        const urlParamsMatch = tokenURI.match(/image=(.*)/);
-        if (urlParamsMatch && urlParamsMatch[1]) {
-            try {
-                imageUrl = decodeURIComponent(urlParamsMatch[1]);
-            } catch (e) {
-                console.warn("Error decoding image URL from simulated tokenURI:", e);
-            }
-        } else {
-            // Fallback for simulated image if not in URL params
-            imageUrl = `https://placehold.co/400x400/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=NFT+${simulatedId}`;
-        }
+        // Parse query parameters from the simulated URI
+        const url = new URL(tokenURI);
+        // Ensure 'id' is always present for simulated NFTs
+        const simulatedId = url.searchParams.get('id') || 'unknown'; 
+        name = url.searchParams.get('name') || `NFT Minteado #${simulatedId}`;
+        description = url.searchParams.get('description') || 'Un NFT generado por el script de despliegue.';
+        imageUrl = url.searchParams.get('image') || `https://placehold.co/400x400/${Math.floor(Math.random()*16777215).toString(16)}/FFFFFF?text=NFT+Simulado`;
         
         return { name, description, image: imageUrl };
 
@@ -462,6 +456,9 @@ async function updateUI() {
             mtkBalanceSpan.textContent = parseFloat(ethers.utils.formatUnits(balance, 18)).toFixed(2);
         }
         addLog(`✅ Balance de MTK actualizado: ${mtkBalanceSpan ? mtkBalanceSpan.textContent : 'N/A'}`, 'success');
+        // Add a debug log to show the MY_TOKEN_ADDRESS currently used by the frontend
+        console.log(`DEBUG: MY_TOKEN_ADDRESS (frontend): ${MY_TOKEN_ADDRESS}`);
+
     } catch (e) {
         addLog("❌ Error actualizando balance: " + e.message, 'error'); // Added log for errors
         console.error("DEBUG: Error updating balance:", e);
@@ -481,6 +478,8 @@ async function loadUserNFTs() {
     if (!signer || !currentAccount) {
         addLog("ℹ️ No hay firmante o cuenta para cargar los NFTs del usuario.", 'info');
         console.log("DEBUG: loadUserNFTs: No signer or currentAccount. Exiting.");
+        userNftsGrid.innerHTML = '<p class="text-gray-400">Conecta tu billetera para ver tus NFTs.</p>';
+        userNftsCountSpan.textContent = "0";
         isUserNFTsLoading = false;
         return;
     }
